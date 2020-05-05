@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-var logfile string
 var core zapcore.Core
 
 type ZapLog struct {
@@ -16,7 +15,7 @@ type ZapLog struct {
 }
 
 func init() {
-	logfile = cfg.EnvConfig.Log.Logfile
+	logfile := cfg.EnvConfig.Log.Logfile
 
 	hook := lumberjack.Logger{
 		Filename:   logfile, // 日志文件路径
