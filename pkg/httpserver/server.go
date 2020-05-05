@@ -4,6 +4,7 @@ import (
 	"github.com/bsir2020/basework/pkg/filter"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type Server struct {
@@ -49,7 +50,7 @@ func (s *Server) Run(ip string, port int64) {
 	s.engine.Use(gin.Logger())
 	s.engine.Use(gin.Recovery())
 	s.engine.NoRoute(s.noResponse)
-	s.engine.Run(ip + ":" + string(port))
+	s.engine.Run(ip + ":" + strconv.FormatInt(port, 10))
 }
 
 func (s *Server) cross() gin.HandlerFunc {
