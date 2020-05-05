@@ -1,0 +1,36 @@
+desc = "dev config"
+
+[pgsql]
+hosts = ["192.168.1.222"]
+ports = [5432]
+user = "postgres"
+password = "psql"
+dbname = "postgres"
+
+[redis]
+hosts = ["redis://192.168.1.222:6379"]
+password = "xjwl"
+
+[rabbitmq]
+user = "test"
+password = "test"
+ip = ["192.168.1.222"]
+port = [5672]
+vhost = ["test"]
+quName = ["test.xx"]
+rtKey = ["test.xx"]
+exName = ["test.xx"]
+exType = ["topic"]
+
+[log]
+logfile = "item.log"
+sqlog = "sql.log"
+
+[authkey]
+key = "widXNlcm5hb@#￥iOiLlvKD%￥uIkiLCJm&WxsX25*bWUiOiL"
+subject = "happy new year"
+privateKey = "./scripts/private_key.pem"
+publickey = "./scripts/public_key.pem"
+
+
+
