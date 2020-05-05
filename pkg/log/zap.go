@@ -14,7 +14,7 @@ var (
 )
 
 type ZapLog struct {
-	logger *zap.Logger
+	Logger *zap.Logger
 }
 
 func init() {
@@ -62,7 +62,7 @@ func init() {
 	zapLog.Info("log 初始化成功")
 
 	Loger = &ZapLog{
-		logger: zapLog,
+		Logger: zapLog,
 	}
 }
 
@@ -71,17 +71,17 @@ func New() (logger *ZapLog) {
 }
 
 func (z *ZapLog) Info(methodName, msg string, err error) {
-	z.logger.Info(msg, zap.String(methodName, err.Error()))
+	z.Logger.Info(msg, zap.String(methodName, err.Error()))
 }
 
 func (z *ZapLog) Error(methodName, msg string, err error) {
-	z.logger.Error(msg, zap.String(methodName, err.Error()))
+	z.Logger.Error(msg, zap.String(methodName, err.Error()))
 }
 
 func (z *ZapLog) Debug(methodName, msg string, err error) {
-	z.logger.Debug(msg, zap.String(methodName, err.Error()))
+	z.Logger.Debug(msg, zap.String(methodName, err.Error()))
 }
 
 func (z *ZapLog) Fatal(methodName, msg string, err error) {
-	z.logger.Fatal(msg, zap.String(methodName, err.Error()))
+	z.Logger.Fatal(msg, zap.String(methodName, err.Error()))
 }
