@@ -16,7 +16,9 @@ type Server struct {
 func New() *Server {
 	e := gin.Default()
 	return &Server{
-		engine: e,
+		engine:   e,
+		pathPost: make(map[string]gin.HandlerFunc),
+		pathGet:  make(map[string]gin.HandlerFunc),
 	}
 }
 
