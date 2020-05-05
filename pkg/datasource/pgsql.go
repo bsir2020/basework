@@ -1,6 +1,7 @@
 package datasource
 
 import (
+	"database/sql"
 	"fmt"
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
@@ -65,6 +66,30 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 		logger.Fatal("GetPGSql", "database connect failed", err)
 
 		fmt.Printf("database connect failed : %s", err.Error())
+	} else {
+		logger.Info("GetPGSql", "database connect ok", err)
+		fmt.Printf("database connect ok")
+	}
+
+	return
+}
+
+func GetPG() (db *sql.DB) {
+	logger := log.New()
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		logger.Fatal("GETPG", "database connect failed", err)
+	}
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		logger.Fatal("GETPG", "database connect failed", err)
 	} else {
 		logger.Info("GetPGSql", "database connect ok", err)
 		fmt.Printf("database connect ok")
