@@ -25,7 +25,7 @@ func init() {
 }
 
 func newRedisPool() *redis.Pool {
-	logger := log.GetLogger()
+	logger := log.New()
 
 	return &redis.Pool{
 		MaxIdle:     redisMaxIdle,
