@@ -91,7 +91,7 @@ func GetPG() (db *sql.DB) {
 	if err != nil {
 		logger.Fatal("GETPG", "database connect failed", err)
 	} else {
-		logger.Info("GetPGSql", "database connect ok", err)
+		logger.Info("GETPG", "database connect ok", err)
 		fmt.Printf("database connect ok")
 	}
 
