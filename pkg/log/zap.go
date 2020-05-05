@@ -8,7 +8,10 @@ import (
 	"os"
 )
 
-var core zapcore.Core
+var (
+	core  zapcore.Core
+	Loger *ZapLog
+)
 
 type ZapLog struct {
 	logger *zap.Logger
@@ -47,9 +50,7 @@ func init() {
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(&hook)), // 打印到控制台和文件
 		atomicLevel, // 日志级别
 	)
-}
 
-func New() (logger *ZapLog) {
 	// 开启开发模式，堆栈跟踪
 	caller := zap.AddCaller()
 	// 开启文件及行号
@@ -60,9 +61,13 @@ func New() (logger *ZapLog) {
 	zapLog := zap.New(core, caller, development, filed)
 	zapLog.Info("log 初始化成功")
 
-	return &ZapLog{
+	Loger = &ZapLog{
 		logger: zapLog,
 	}
+}
+
+func New() (logger *ZapLog) {
+	return Loger
 }
 
 func (z *ZapLog) Info(methodName, msg string, err error) {
