@@ -57,7 +57,7 @@ func init() {
 	// 开启文件及行号
 	development := zap.Development()
 	// 设置初始化字段
-	filed := zap.Fields(zap.String("serviceName", "serviceName"))
+	filed := zap.Fields(zap.String("serviceName", cfg.EnvConfig.Authkey.Subject))
 	// 构造日志
 	ZapLoger = zap.New(core, caller, development, filed)
 	ZapLoger.Info("log 初始化成功")
