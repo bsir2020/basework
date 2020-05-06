@@ -38,7 +38,7 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		jwt := auth.New()
 		a := c.Request.Header.Get("auth")
 		if a == "" {
-			f.buildResponse(10001, false, "auth is nil", nil, c)
+			f.buildResponse(1001, false, "token为空", nil, c)
 			return
 		}
 		//e := c.Request.Header.Get("exp")
@@ -48,7 +48,7 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		//解密
 		authData, err := rsa.RsaDecrypt(a)
 		if err != nil {
-			f.buildResponse(10002, false, err.Error(), nil, c)
+			f.buildResponse(1002, false, err.Error(), nil, c)
 			return
 		}
 
@@ -69,18 +69,18 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		//token
 		if !jwt.TokenIsInvalid(string(authData)) {
-			f.buildResponse(10004, false, err.Error(), nil, c)
+			f.buildResponse(1004, false, err.Error(), nil, c)
 			return
 		}
 
 		u, _ := c.GetPostForm("uid")
 
 		if m, err := jwt.ParseToken(a); err != nil {
-			f.buildResponse(10005, false, err.Error(), nil, c)
+			f.buildResponse(1005, false, err.Error(), nil, c)
 			return
 		} else {
 			if u != m["uid"] {
-				f.buildResponse(10006, false, err.Error(), nil, c)
+				f.buildResponse(1006, false, err.Error(), nil, c)
 				return
 			}
 		}
