@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	cfg "github.com/bsir2020/basework/configs"
 	"io/ioutil"
 )
@@ -15,6 +14,7 @@ var (
 	publicKey  []byte
 	privateKey []byte
 	pub        *rsa.PublicKey
+	priv       *rsa.PrivateKey
 )
 
 func init() {
@@ -28,21 +28,32 @@ func init() {
 	if err != nil {
 		panic("read public pem fail")
 	}
-}
 
-// 加密
-func RsaEncrypt(origData []byte) ([]byte, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
-		return nil, errors.New("public key error")
+		panic("public key error")
 	}
+
 	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		panic(err.Error())
 	}
 
 	pub = pubInterface.(*rsa.PublicKey)
 
+	block, _ = pem.Decode(privateKey)
+	if block == nil {
+		panic("private key error")
+	}
+
+	priv, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+// 加密
+func RsaEncrypt(origData []byte) ([]byte, error) {
 	partLen := pub.N.BitLen()/8 - 11
 	chunks := split([]byte(origData), partLen)
 	buffer := bytes.NewBufferString("")
@@ -56,22 +67,10 @@ func RsaEncrypt(origData []byte) ([]byte, error) {
 	}
 
 	return buffer.Bytes(), nil
-
-	//return rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
 }
 
 // 解密
 func RsaDecrypt(ciphertext string) ([]byte, error) {
-	block, _ := pem.Decode(privateKey)
-	if block == nil {
-		return nil, errors.New("private key error!")
-	}
-
-	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
 	partLen := pub.N.BitLen() / 8
 	chunks := split([]byte([]byte(ciphertext)), partLen)
 	buffer := bytes.NewBufferString("")
