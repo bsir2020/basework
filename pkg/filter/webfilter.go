@@ -5,17 +5,23 @@ import (
 	"github.com/bsir2020/basework/pkg/auth"
 	"github.com/bsir2020/basework/pkg/rsa"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	//"strconv"
-	//"time"
+	"time"
 )
 
 type Filter struct {
 }
 
-func (f *Filter) respondWithError(code int, message string, c *gin.Context) {
-	resp := map[string]string{"error": message}
+func (f *Filter) buildResponse(code int, status bool, errmsg string, data interface{}, c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":      code,
+		"success":   status,
+		"err_msg":   errmsg,
+		"data":      data,
+		"timestamp": time.Now().String(),
+	})
 
-	c.JSON(code, resp)
 	c.Abort()
 }
 
@@ -31,6 +37,10 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		jwt := auth.New()
 		a := c.Request.Header.Get("auth")
+		if a == "" {
+			f.buildResponse(10001, false, "auth is nil", nil, c)
+			return
+		}
 		//e := c.Request.Header.Get("exp")
 
 		//isOK = true
@@ -38,7 +48,7 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		//解密
 		authData, err := rsa.RsaDecrypt(a)
 		if err != nil {
-			f.respondWithError(10001, err.Error(), c)
+			f.buildResponse(10002, false, err.Error(), nil, c)
 			return
 		}
 
@@ -59,18 +69,18 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		//token
 		if !jwt.TokenIsInvalid(string(authData)) {
-			f.respondWithError(10004, err.Error(), c)
+			f.buildResponse(10004, false, err.Error(), nil, c)
 			return
 		}
 
 		u, _ := c.GetPostForm("uid")
 
 		if m, err := jwt.ParseToken(a); err != nil {
-			f.respondWithError(10005, err.Error(), c)
+			f.buildResponse(10005, false, err.Error(), nil, c)
 			return
 		} else {
 			if u != m["uid"] {
-				f.respondWithError(10006, "uid no match", c)
+				f.buildResponse(10006, false, err.Error(), nil, c)
 				return
 			}
 		}
