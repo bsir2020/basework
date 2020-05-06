@@ -66,10 +66,10 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	if err = pgEngine.Ping(); err != nil {
 		logger.Fatal("GetPGSql", zap.String("database connect", err.Error()))
 
-		fmt.Printf("database connect failed : %s", err.Error())
+		//fmt.Printf("database connect failed : %s", err.Error())
 	} else {
 		logger.Info("GetPGSql", zap.String("database connect ok", err.Error()))
-		fmt.Printf("database connect ok")
+		//fmt.Printf("database connect ok")
 	}
 
 	return
@@ -92,7 +92,7 @@ func GetPG() (db *sql.DB) {
 		logger.Fatal("GETPG", zap.String("database connect failed", err.Error()))
 	} else {
 		logger.Info("GETPG", zap.String("database connect ok", ""))
-		fmt.Printf("database connect ok")
+		//fmt.Printf("database connect ok")
 	}
 
 	return
