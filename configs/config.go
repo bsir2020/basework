@@ -14,6 +14,7 @@ type Config struct {
 	Log      *LogConfig
 	Authkey  *AuthkeyConfig
 	Fillter  *FillterConfig
+	RunMode  int
 }
 
 type PgSqlConfig struct {

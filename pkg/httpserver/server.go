@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/filter"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,6 +15,13 @@ type Server struct {
 }
 
 func New() *Server {
+	switch configs.EnvConfig.RunMode {
+	case 1:
+		gin.SetMode(gin.DebugMode)
+	case 2:
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	e := gin.Default()
 	return &Server{
 		engine:   e,
