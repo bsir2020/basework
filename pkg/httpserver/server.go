@@ -37,11 +37,11 @@ func (s *Server) assem() {
 	authorized.Use(filter.Checkauth())
 	{
 		for key, handle := range s.pathGet {
-			s.engine.GET(key, handle)
+			authorized.GET(key, handle)
 		}
 
 		for key, handle := range s.pathPost {
-			s.engine.POST(key, handle)
+			authorized.POST(key, handle)
 		}
 	}
 }

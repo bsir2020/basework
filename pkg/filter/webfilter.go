@@ -1,11 +1,12 @@
 package filter
 
 import (
+	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/auth"
 	"github.com/bsir2020/basework/pkg/rsa"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"time"
+	//"strconv"
+	//"time"
 )
 
 type Filter struct {
@@ -21,31 +22,40 @@ func (f *Filter) respondWithError(code int, message string, c *gin.Context) {
 //请求head,必须包含auth,exp项
 func (f *Filter) Checkauth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if _, ok := configs.WhiteList[c.FullPath()]; ok {
+			//放行
+			c.Next()
+
+			return
+		}
+
 		jwt := auth.New()
 		a := c.Request.Header.Get("auth")
-		e := c.Request.Header.Get("exp")
+		//e := c.Request.Header.Get("exp")
 
 		//isOK = true
 
 		//解密
-		authData, err := rsa.RsaDecrypt([]byte(a))
+		authData, err := rsa.RsaDecrypt(a)
 		if err != nil {
 			f.respondWithError(10001, err.Error(), c)
 			return
 		}
 
-		expData, err := rsa.RsaDecrypt([]byte(e))
-		if err != nil {
-			f.respondWithError(10002, err.Error(), c)
-			return
-		}
+		/*
+			expData, err := rsa.RsaDecrypt(e)
+			if err != nil {
+				f.respondWithError(10002, err.Error(), c)
+				return
+			}
 
-		//超时
-		t, _ := strconv.ParseInt(string(expData), 10, 64)
-		if time.Now().Unix() > t {
-			f.respondWithError(10003, err.Error(), c)
-			return
-		}
+			//超时
+			t, _ := strconv.ParseInt(string(expData), 10, 64)
+			if time.Now().Unix() > t {
+				f.respondWithError(10003, err.Error(), c)
+				return
+			}
+		*/
 
 		//token
 		if !jwt.TokenIsInvalid(string(authData)) {

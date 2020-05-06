@@ -13,6 +13,7 @@ type Config struct {
 	Rabbitmq *RabbitmqConfig
 	Log      *LogConfig
 	Authkey  *AuthkeyConfig
+	Fillter  *FillterConfig
 }
 
 type PgSqlConfig struct {
@@ -52,12 +53,17 @@ type AuthkeyConfig struct {
 	Publickey  string
 }
 
+type FillterConfig struct {
+	Array []string
+}
+
 var (
 	confPath  string
 	env       string
 	logfile   string
 	sqlfile   string
 	EnvConfig *Config
+	WhiteList map[string]string
 )
 
 func init() {
@@ -71,9 +77,16 @@ func init() {
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
+		WhiteList = make(map[string]string)
+
 		EnvConfig.Log.Logfile = "/logs/financass/" + logfile
 		EnvConfig.Log.Sqlog = "/logs/financass/" + sqlfile
 
 		fmt.Println(EnvConfig.Desc)
+
+		//
+		for _, path := range EnvConfig.Fillter.Array {
+			WhiteList[path] = path
+		}
 	}
 }

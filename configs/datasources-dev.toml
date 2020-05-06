@@ -32,5 +32,8 @@ subject = "happy new year"
 privateKey = "./scripts/private_key.pem"
 publickey = "./scripts/public_key.pem"
 
+[fillter]
+array = ["/login/","/getToken/"]
+
 
 
