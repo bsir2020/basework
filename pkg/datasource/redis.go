@@ -5,6 +5,7 @@ import (
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/garyburd/redigo/redis"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -32,12 +33,12 @@ func newRedisPool() *redis.Pool {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.DialURL(redisURL)
 			if err != nil {
-				logger.Fatal("newRedisPool", "redis connection error", err)
+				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
 			}
 			//验证redis密码
 			if _, authErr := c.Do("AUTH", redisPassword); authErr != nil {
-				logger.Fatal("newRedisPool", "redis connection error", err)
+				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
 
 				return nil, fmt.Errorf("redis auth password error: %s", authErr)
 			}
@@ -46,7 +47,7 @@ func newRedisPool() *redis.Pool {
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			_, err := c.Do("PING")
 			if err != nil {
-				logger.Fatal("newRedisPool", "redis connection error", err)
+				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
 
 				return fmt.Errorf("ping redis error: %s", err)
 			}

@@ -9,13 +9,14 @@ import (
 )
 
 var (
-	core  zapcore.Core
-	Loger *ZapLog
+	core zapcore.Core
+	//Loger *ZapLog
+	ZapLoger *zap.Logger
 )
 
-type ZapLog struct {
-	logger *zap.Logger
-}
+//type ZapLog struct {
+//	Logger *zap.Logger
+//}
 
 func init() {
 	logfile := cfg.EnvConfig.Log.Logfile
@@ -58,30 +59,30 @@ func init() {
 	// 设置初始化字段
 	filed := zap.Fields(zap.String("serviceName", "serviceName"))
 	// 构造日志
-	zapLoger := zap.New(core, caller, development, filed)
-	zapLoger.Info("log 初始化成功")
+	ZapLoger = zap.New(core, caller, development, filed)
+	ZapLoger.Info("log 初始化成功")
 
-	Loger = &ZapLog{
-		logger: zapLoger,
-	}
+	//Loger = &ZapLog{
+	//	Logger: ZapLoger,
+	//}
 }
 
-func New() (logger *ZapLog) {
-	return Loger
+func New() (logger *zap.Logger) {
+	return ZapLoger
 }
 
-func (z *ZapLog) Info(methodName, msg string, err error) {
-	z.logger.Info(msg, zap.String(methodName, ""))
-}
-
-func (z *ZapLog) Error(methodName, msg string, err error) {
-	z.logger.Error(msg, zap.String(methodName, err.Error()))
-}
-
-func (z *ZapLog) Debug(methodName, msg string, err error) {
-	z.logger.Debug(msg, zap.String(methodName, err.Error()))
-}
-
-func (z *ZapLog) Fatal(methodName, msg string, err error) {
-	z.logger.Fatal(msg, zap.String(methodName, err.Error()))
-}
+//func (z *ZapLog) Info(methodName, msg string, err error) {
+//	z.Logger.Info(msg, zap.String(methodName, ""))
+//}
+//
+//func (z *ZapLog) Error(methodName, msg string, err error) {
+//	z.Logger.Error(msg, zap.String(methodName, err.Error()))
+//}
+//
+//func (z *ZapLog) Debug(methodName, msg string, err error) {
+//	z.Logger.Debug(msg, zap.String(methodName, err.Error()))
+//}
+//
+//func (z *ZapLog) Fatal(methodName, msg string, err error) {
+//	z.Logger.Fatal(msg, zap.String(methodName, err.Error()))
+//}

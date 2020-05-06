@@ -7,6 +7,7 @@ import (
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/go-xorm/xorm"
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 	"os"
 	"time"
 	"xorm.io/core"
@@ -40,7 +41,7 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	pgEngine, err := xorm.NewEngine("postgres", psqlInfo)
 	if err != nil {
 		println(err.Error())
-		logger.Fatal("GetPGSql", "create engine failed", err)
+		logger.Fatal("GetPGSql", zap.String("create engine failed", err.Error()))
 
 		return
 	}
@@ -48,7 +49,7 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	// 设置日志
 	logFile, err := os.Create(logfile)
 	if err != nil {
-		logger.Fatal("GetPGSql", "create sql.log failed", err)
+		logger.Fatal("GetPGSql", zap.String("create sql.log failed", err.Error()))
 
 		println(err.Error())
 		return
@@ -63,11 +64,11 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	pgEngine.ShowSQL(true)
 
 	if err = pgEngine.Ping(); err != nil {
-		logger.Fatal("GetPGSql", "database connect failed", err)
+		logger.Fatal("GetPGSql", zap.String("database connect", err.Error()))
 
 		fmt.Printf("database connect failed : %s", err.Error())
 	} else {
-		logger.Info("GetPGSql", "database connect ok", err)
+		logger.Info("GetPGSql", zap.String("database connect ok", err.Error()))
 		fmt.Printf("database connect ok")
 	}
 
@@ -83,15 +84,14 @@ func GetPG() (db *sql.DB) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		logger.Fatal("GETPG", "database connect failed", err)
+		logger.Fatal("GETPG", zap.String("database connect failed", err.Error()))
 	}
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
-		logger.Fatal("GETPG", "database connect failed", err)
+		logger.Fatal("GETPG", zap.String("database connect failed", err.Error()))
 	} else {
-		logger.Info("GETPG", "database connect ok", err)
+		logger.Info("GETPG", zap.String("database connect ok", ""))
 		fmt.Printf("database connect ok")
 	}
 

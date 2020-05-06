@@ -68,7 +68,7 @@ var (
 
 func init() {
 	flag.StringVar(&env, "env", "dev", "set running env")
-	//flag.StringVar(&logfile, "logfile", "log", "set log file")
+	flag.StringVar(&logfile, "logfile", "", "set log file")
 	//flag.StringVar(&sqlfile, "sqllog", "sql", "set sql log file")
 
 	confPath = "./configs/datasources-" + env + ".toml"
@@ -79,7 +79,9 @@ func init() {
 	} else {
 		WhiteList = make(map[string]string)
 
-		//EnvConfig.Log.Logfile = "./" + logfile
+		if logfile != "" {
+			EnvConfig.Log.Logfile = logfile
+		}
 		//EnvConfig.Log.Sqlog = "./" + sqlfile
 
 		fmt.Println(EnvConfig.Desc)

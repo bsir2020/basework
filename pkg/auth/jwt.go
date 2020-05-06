@@ -6,6 +6,7 @@ import (
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/dgrijalva/jwt-go"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -42,7 +43,7 @@ func (j *JWT) CreateToken(userid int, exptime int64) (res Token) {
 	tokenString, err := token.SignedString([]byte(j.signingKey))
 	if err != nil {
 		fmt.Print("Error while signing the token")
-		authLog.Fatal("CreateToken", "Error while signing the token", err)
+		authLog.Fatal("CreateToken", zap.String("Error while signing the token", err.Error()))
 	}
 
 	res = Token{tokenString}
@@ -58,7 +59,7 @@ func (j *JWT) ParseToken(tokenString string) (jwt.MapClaims, error) {
 		return []byte(j.signingKey), nil
 	})
 	if err != nil {
-		authLog.Error("ParseToken", "parse token error", err)
+		authLog.Error("ParseToken", zap.String("parse token error", err.Error()))
 		return nil, err
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid { // 校验token
@@ -71,7 +72,7 @@ func (j *JWT) ParseToken(tokenString string) (jwt.MapClaims, error) {
 func (j *JWT) TokenIsInvalid(tokenString string) bool {
 	claims, err := j.ParseToken(tokenString)
 	if err != nil {
-		authLog.Fatal("TokenIsInvalid", "valid token error", err)
+		authLog.Fatal("TokenIsInvalid", zap.String("valid token error", err.Error()))
 	} else {
 		//校验下token是否过期
 		if res := claims.VerifyExpiresAt(time.Now().Unix(), true); res == false {
