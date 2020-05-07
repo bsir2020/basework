@@ -12,6 +12,8 @@ type Server struct {
 	engine   *gin.Engine
 	pathGet  map[string]gin.HandlerFunc
 	pathPost map[string]gin.HandlerFunc
+	pathPut    map[string]gin.HandlerFunc
+	pathDelete map[string]gin.HandlerFunc
 }
 
 func New() *Server {
@@ -27,8 +29,15 @@ func New() *Server {
 		engine:   e,
 		pathPost: make(map[string]gin.HandlerFunc),
 		pathGet:  make(map[string]gin.HandlerFunc),
+		pathPut:    make(map[string]gin.HandlerFunc),
+		pathDelete: make(map[string]gin.HandlerFunc),
 	}
 }
+
+func (s *Server) SetStatic(path string, dir string) {
+	s.engine.Static(path, dir)
+}
+
 
 func (s *Server) SetGetRouter(route string, handle func(*gin.Context)) {
 	s.pathGet[route] = handle
@@ -36,6 +45,14 @@ func (s *Server) SetGetRouter(route string, handle func(*gin.Context)) {
 
 func (s *Server) SetPostRouter(route string, handle func(*gin.Context)) {
 	s.pathPost[route] = handle
+}
+
+func (s *Server) SetPutRouter(route string, handle func(*gin.Context)) {
+	s.pathPut[route] = handle
+}
+
+func (s *Server) SetDeleteRouter(route string, handle func(*gin.Context)) {
+	s.pathDelete[route] = handle
 }
 
 func (s *Server) assem() {
