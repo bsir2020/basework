@@ -17,10 +17,10 @@ type Server struct {
 }
 
 const (
-	GET_MOTHOD    = 0
-	POST_MOTHOD   = 1
-	PUT_MOTHOD    = 2
-	DELETE_MOTHOD = 3
+	GET_METHOD    = 0
+	POST_METHOD   = 1
+	PUT_METHOD    = 2
+	DELETE_METHOD = 3
 )
 
 func New() *Server {
@@ -84,13 +84,13 @@ func (s *Server) SetGroup(route string) *gin.RouterGroup {
 
 func (s *Server) AddHandleByGroup(group *gin.RouterGroup, route string, methodType int, handle func(*gin.Context)) {
 	switch methodType {
-	case GET_MOTHOD:
+	case GET_METHOD:
 		group.GET(route, handle)
-	case POST_MOTHOD:
+	case POST_METHOD:
 		group.POST(route, handle)
-	case PUT_MOTHOD:
+	case PUT_METHOD:
 		group.PUT(route, handle)
-	case DELETE_MOTHOD:
+	case DELETE_METHOD:
 		group.DELETE(route, handle)
 	default:
 		print("no support method")
