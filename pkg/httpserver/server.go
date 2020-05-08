@@ -49,6 +49,10 @@ func (s *Server) SetStatic(path string, dir string) {
 	s.engine.Static(path, dir)
 }
 
+func (s *Server) LoadHTMLGlob(pattern string) {
+	s.engine.LoadHTMLGlob(pattern)
+}
+
 func (s *Server) SetGetRouter(route string, handle func(*gin.Context)) {
 	s.pathGet[route] = handle
 }
