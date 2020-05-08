@@ -28,6 +28,7 @@ type PgSqlConfig struct {
 type RedisConfig struct {
 	Hosts    []string
 	Password string
+	DB       int
 }
 
 type RabbitmqConfig struct {

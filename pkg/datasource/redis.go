@@ -17,11 +17,13 @@ const (
 var (
 	redisURL      string
 	redisPassword string
+	db            int
 )
 
 func init() {
 	redisURL = cfg.EnvConfig.Redis.Hosts[0]
 	redisPassword = cfg.EnvConfig.Redis.Password
+	db = cfg.EnvConfig.Redis.DB
 }
 
 func newRedisPool() *redis.Pool {
@@ -31,7 +33,7 @@ func newRedisPool() *redis.Pool {
 		MaxIdle:     redisMaxIdle,
 		IdleTimeout: redisIdleTimeoutSec * time.Second,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(redisURL)
+			c, err := redis.DialURL(redisURL, redis.DialDatabase(db))
 			if err != nil {
 				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)

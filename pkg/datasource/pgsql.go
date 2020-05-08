@@ -31,17 +31,17 @@ func init() {
 	logfile = cfg.EnvConfig.Log.Sqlog
 }
 
-func GetPGSql() (pgEngine *xorm.Engine) {
+func GetPGSql() (pgEngine *xorm.Engine, err error) {
 	logger := log.New()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	pgEngine, err := xorm.NewEngine("postgres", psqlInfo)
+	pgEngine, err = xorm.NewEngine("postgres", psqlInfo)
 	if err != nil {
 		println(err.Error())
-		logger.Fatal("GetPGSql", zap.String("create engine failed", err.Error()))
+		logger.Error("GetPGSql", zap.String("create engine failed", err.Error()))
 
 		return
 	}
@@ -49,7 +49,7 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	// 设置日志
 	logFile, err := os.Create(logfile)
 	if err != nil {
-		logger.Fatal("GetPGSql", zap.String("create sql.log failed", err.Error()))
+		logger.Error("GetPGSql", zap.String("create sql.log failed", err.Error()))
 
 		println(err.Error())
 		return
@@ -64,7 +64,7 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	pgEngine.ShowSQL(true)
 
 	if err = pgEngine.Ping(); err != nil {
-		logger.Fatal("GetPGSql", zap.String("database connect", err.Error()))
+		logger.Error("GetPGSql", zap.String("database connect", err.Error()))
 
 		//fmt.Printf("database connect failed : %s", err.Error())
 	} else {
@@ -75,21 +75,21 @@ func GetPGSql() (pgEngine *xorm.Engine) {
 	return
 }
 
-func GetPG() (db *sql.DB) {
+func GetPG() (db *sql.DB, err error) {
 	logger := log.New()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
-		logger.Fatal("GETPG", zap.String("database connect failed", err.Error()))
+		logger.Error("GETPG", zap.String("database connect failed", err.Error()))
 	}
 
 	err = db.Ping()
 	if err != nil {
-		logger.Fatal("GETPG", zap.String("database connect failed", err.Error()))
+		logger.Error("GETPG", zap.String("database connect failed", err.Error()))
 	} else {
 		logger.Info("GETPG", zap.String("database connect ok", ""))
 		//fmt.Printf("database connect ok")

@@ -9,8 +9,9 @@ password = "psql"
 dbname = "postgres"
 
 [redis]
-hosts = ["redis://192.168.1.222:6379"]
+hosts = ["redis://192.168.1.222:6379 0"]
 password = "xjwl"
+db = 0
 
 [rabbitmq]
 user = "test"
