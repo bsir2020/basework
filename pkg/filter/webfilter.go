@@ -30,6 +30,7 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if _, ok := configs.WhiteList[c.FullPath()]; ok {
 			//放行
+			print(c.FullPath())
 			c.Next()
 
 			return
