@@ -1,13 +1,13 @@
 package filter
 
 import (
-	"fmt"
 	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/auth"
 	"github.com/bsir2020/basework/pkg/rsa"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	//"strconv"
+	"fmt"
 	"time"
 )
 
@@ -29,9 +29,9 @@ func (f *Filter) buildResponse(code int, status bool, errmsg string, data interf
 //请求head,必须包含auth,exp项
 func (f *Filter) Checkauth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Println("===========", c.FullPath())
 		if _, ok := configs.WhiteList[c.FullPath()]; ok {
 			//放行
-			fmt.Println("===========", c.FullPath())
 			c.Next()
 
 			return
@@ -47,11 +47,14 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		//isOK = true
 
+		var err error
 		//解密
-		authData, err := rsa.RsaDecrypt(a)
-		if err != nil {
-			f.buildResponse(1002, false, err.Error(), nil, c)
-			return
+		if configs.EnvConfig.RunMode != 1 {
+			a, err = rsa.RsaDecrypt(a)
+			if err != nil {
+				f.buildResponse(1002, false, err.Error(), nil, c)
+				return
+			}
 		}
 
 		/*
@@ -70,22 +73,22 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		*/
 
 		//token
-		if !jwt.TokenIsInvalid(string(authData)) {
-			f.buildResponse(1004, false, err.Error(), nil, c)
+		if !jwt.TokenIsInvalid(a) {
+			f.buildResponse(1004, false, "token is invalid", nil, c)
 			return
 		}
 
-		u, _ := c.GetPostForm("uid")
-
-		if m, err := jwt.ParseToken(a); err != nil {
-			f.buildResponse(1005, false, err.Error(), nil, c)
-			return
-		} else {
-			if u != m["uid"] {
-				f.buildResponse(1006, false, err.Error(), nil, c)
-				return
-			}
-		}
+		//u, _ := c.GetPostForm("uid")
+		//
+		//if m, err := jwt.ParseToken(a); err != nil {
+		//	f.buildResponse(1005, false, err.Error(), nil, c)
+		//	return
+		//} else {
+		//	if u != m["uid"] {
+		//		f.buildResponse(1006, false, err.Error(), nil, c)
+		//		return
+		//	}
+		//}
 
 		//放行
 		c.Next()

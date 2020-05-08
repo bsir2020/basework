@@ -70,7 +70,7 @@ func RsaEncrypt(origData []byte) ([]byte, error) {
 }
 
 // 解密
-func RsaDecrypt(ciphertext string) ([]byte, error) {
+func RsaDecrypt(ciphertext string) (string, error) {
 	partLen := pub.N.BitLen() / 8
 	chunks := split([]byte([]byte(ciphertext)), partLen)
 	buffer := bytes.NewBufferString("")
@@ -82,7 +82,7 @@ func RsaDecrypt(ciphertext string) ([]byte, error) {
 		buffer.Write(decrypted)
 	}
 
-	return buffer.Bytes(), nil
+	return buffer.String(), nil
 }
 
 func split(buf []byte, lim int) [][]byte {
