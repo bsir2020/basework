@@ -78,11 +78,11 @@ func (s *Server) assem() {
 	}
 }
 
-func (s *Server) setGroup(route string) *gin.RouterGroup {
+func (s *Server) SetGroup(route string) *gin.RouterGroup {
 	return s.engine.Group(route)
 }
 
-func (s *Server) addHandleByGroup(group *gin.RouterGroup, route string, methodType int, handle func(*gin.Context)) {
+func (s *Server) AddHandleByGroup(group *gin.RouterGroup, route string, methodType int, handle func(*gin.Context)) {
 	switch methodType {
 	case GET_MOTHOD:
 		group.GET(route, handle)
