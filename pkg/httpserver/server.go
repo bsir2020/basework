@@ -9,12 +9,19 @@ import (
 )
 
 type Server struct {
-	engine   *gin.Engine
-	pathGet  map[string]gin.HandlerFunc
-	pathPost map[string]gin.HandlerFunc
+	engine     *gin.Engine
+	pathGet    map[string]gin.HandlerFunc
+	pathPost   map[string]gin.HandlerFunc
 	pathPut    map[string]gin.HandlerFunc
 	pathDelete map[string]gin.HandlerFunc
 }
+
+const (
+	GET_MOTHOD    = 0
+	POST_MOTHOD   = 1
+	PUT_MOTHOD    = 2
+	DELETE_MOTHOD = 3
+)
 
 func New() *Server {
 	switch configs.EnvConfig.RunMode {
@@ -25,10 +32,14 @@ func New() *Server {
 	}
 
 	e := gin.Default()
+
+	filter := filter.Filter{}
+	e.Use(filter.Checkauth())
+
 	return &Server{
-		engine:   e,
-		pathPost: make(map[string]gin.HandlerFunc),
-		pathGet:  make(map[string]gin.HandlerFunc),
+		engine:     e,
+		pathPost:   make(map[string]gin.HandlerFunc),
+		pathGet:    make(map[string]gin.HandlerFunc),
 		pathPut:    make(map[string]gin.HandlerFunc),
 		pathDelete: make(map[string]gin.HandlerFunc),
 	}
@@ -37,7 +48,6 @@ func New() *Server {
 func (s *Server) SetStatic(path string, dir string) {
 	s.engine.Static(path, dir)
 }
-
 
 func (s *Server) SetGetRouter(route string, handle func(*gin.Context)) {
 	s.pathGet[route] = handle
@@ -56,10 +66,7 @@ func (s *Server) SetDeleteRouter(route string, handle func(*gin.Context)) {
 }
 
 func (s *Server) assem() {
-	filter := filter.Filter{}
-
 	authorized := s.engine.Group("/")
-	authorized.Use(filter.Checkauth())
 	{
 		for key, handle := range s.pathGet {
 			authorized.GET(key, handle)
@@ -68,6 +75,25 @@ func (s *Server) assem() {
 		for key, handle := range s.pathPost {
 			authorized.POST(key, handle)
 		}
+	}
+}
+
+func (s *Server) setGroup(route string) *gin.RouterGroup {
+	return s.engine.Group(route)
+}
+
+func (s *Server) addHandleByGroup(group *gin.RouterGroup, route string, methodType int, handle func(*gin.Context)) {
+	switch methodType {
+	case GET_MOTHOD:
+		group.GET(route, handle)
+	case POST_MOTHOD:
+		group.POST(route, handle)
+	case PUT_MOTHOD:
+		group.PUT(route, handle)
+	case DELETE_MOTHOD:
+		group.DELETE(route, handle)
+	default:
+		print("no support method")
 	}
 }
 

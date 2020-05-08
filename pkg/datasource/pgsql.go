@@ -85,6 +85,7 @@ func GetPG() (db *sql.DB, err error) {
 	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		logger.Error("GETPG", zap.String("database connect failed", err.Error()))
+		return
 	}
 
 	err = db.Ping()
