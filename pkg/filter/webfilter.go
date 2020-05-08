@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"fmt"
 	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/auth"
 	"github.com/bsir2020/basework/pkg/rsa"
@@ -30,7 +31,7 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if _, ok := configs.WhiteList[c.FullPath()]; ok {
 			//放行
-			print("--->", c.FullPath())
+			fmt.Println("===========", c.FullPath())
 			c.Next()
 
 			return
