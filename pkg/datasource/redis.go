@@ -35,12 +35,12 @@ func newRedisPool() *redis.Pool {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.DialURL(redisURL, redis.DialDatabase(db))
 			if err != nil {
-				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
+				logger.Error("newRedisPool", zap.String("redis connection error", err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
 			}
 			//验证redis密码
 			if _, authErr := c.Do("AUTH", redisPassword); authErr != nil {
-				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
+				logger.Error("newRedisPool", zap.String("redis connection error", err.Error()))
 
 				return nil, fmt.Errorf("redis auth password error: %s", authErr)
 			}
@@ -49,7 +49,7 @@ func newRedisPool() *redis.Pool {
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			_, err := c.Do("PING")
 			if err != nil {
-				logger.Fatal("newRedisPool", zap.String("redis connection error", err.Error()))
+				logger.Error("newRedisPool", zap.String("redis connection error", err.Error()))
 
 				return fmt.Errorf("ping redis error: %s", err)
 			}
