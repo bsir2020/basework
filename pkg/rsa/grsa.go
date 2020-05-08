@@ -77,7 +77,7 @@ func RsaDecrypt(ciphertext string) (string, error) {
 	for _, chunk := range chunks {
 		decrypted, err := rsa.DecryptPKCS1v15(rand.Reader, priv, chunk)
 		if err != nil {
-			return string(nil), err
+			return "", err
 		}
 		buffer.Write(decrypted)
 	}
