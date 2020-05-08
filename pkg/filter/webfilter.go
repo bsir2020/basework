@@ -78,17 +78,17 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 			return
 		}
 
-		//u, _ := c.GetPostForm("uid")
-		//
-		//if m, err := jwt.ParseToken(a); err != nil {
-		//	f.buildResponse(1005, false, err.Error(), nil, c)
-		//	return
-		//} else {
-		//	if u != m["uid"] {
-		//		f.buildResponse(1006, false, err.Error(), nil, c)
-		//		return
-		//	}
-		//}
+		u, _ := c.GetPostForm("uid")
+
+		if m, err := jwt.ParseToken(a); err != nil {
+			f.buildResponse(1005, false, err.Error(), nil, c)
+			return
+		} else {
+			if u != m["uid"] {
+				f.buildResponse(1006, false, err.Error(), nil, c)
+				return
+			}
+		}
 
 		//放行
 		c.Next()
