@@ -1,17 +1,24 @@
 package filter
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/auth"
 	"github.com/bsir2020/basework/pkg/rsa"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"net/http"
-	//"strconv"
-	"fmt"
+	"strconv"
 	"time"
 )
 
 type Filter struct {
+}
+
+type loginModul struct {
+	Uid int64 `json:"uid"`
 }
 
 func (f *Filter) buildResponse(code int, status bool, errmsg string, data interface{}, c *gin.Context) {
@@ -78,17 +85,29 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 			return
 		}
 
-		u, _ := c.GetPostForm("uid")
+		loginmodul := loginModul{}
+		data, err := c.GetRawData()
+		if err != json.Unmarshal(data, &loginmodul) {
+			f.buildResponse(500, false, err.Error(), nil, c)
+			return
+		}
+
+		fmt.Println(loginmodul)
 
 		if m, err := jwt.ParseToken(a); err != nil {
-			f.buildResponse(1005, false, err.Error(), nil, c)
+			f.buildResponse(500, false, err.Error(), nil, c)
 			return
 		} else {
-			if u != m["uid"] {
-				f.buildResponse(1006, false, err.Error(), nil, c)
+			uid := m["uid"].(string)
+			Uid, _ := strconv.ParseInt(uid, 10, 64)
+			fmt.Println("param--> ", loginmodul)
+			if Uid != loginmodul.Uid {
+				f.buildResponse(1006, false, "user is invalid", nil, c)
 				return
 			}
 		}
+
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 
 		//放行
 		c.Next()
