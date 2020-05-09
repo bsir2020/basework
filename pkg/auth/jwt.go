@@ -7,6 +7,7 @@ import (
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/dgrijalva/jwt-go"
 	"go.uber.org/zap"
+	"strconv"
 	"time"
 )
 
@@ -30,24 +31,23 @@ func New() (jwt *JWT) {
 	return
 }
 
-func (j *JWT) CreateToken(userid int, exptime int64) (res Token, err error) {
+func (j *JWT) CreateToken(userid int64, exptime int64) (res Token) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	//claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix() //过期时间
 	claims["exp"] = exptime           //过期时间
 	claims["iat"] = time.Now().Unix() //签发时间
 	claims["sub"] = j.subject         //主题
-	claims["uid"] = userid
+	claims["uid"] = strconv.FormatInt(userid, 10)
 	token.Claims = claims
 
 	tokenString, err := token.SignedString([]byte(j.signingKey))
 	if err != nil {
 		fmt.Print("Error while signing the token")
-		authLog.Error("CreateToken", zap.String("Error while signing the token", err.Error()))
-	} else {
-		res = Token{tokenString}
+		authLog.Fatal("CreateToken", zap.String("Error while signing the token", err.Error()))
 	}
 
+	res = Token{tokenString}
 	return
 }
 
@@ -88,7 +88,8 @@ func (j *JWT) TokenIsInvalid(tokenString string) bool {
 			return true
 		}
 
-		if res := claims["uid"].(int); res == 0 {
+		uid := claims["uid"].(string)
+		if res, _ := strconv.ParseInt(uid, 10, 64); res == 0 {
 			return true
 		}
 	}
