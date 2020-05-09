@@ -26,24 +26,19 @@ func init() {
 	db = cfg.EnvConfig.Redis.DB
 }
 
-func newRedisPool() *redis.Pool {
+func newRedisPool() (redisPool *redis.Pool, err error) {
 	logger := log.New()
 
 	return &redis.Pool{
 		MaxIdle:     redisMaxIdle,
 		IdleTimeout: redisIdleTimeoutSec * time.Second,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(redisURL, redis.DialDatabase(db))
+			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword))
 			if err != nil {
 				logger.Error("newRedisPool", zap.String("redis connection error", err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
 			}
-			//验证redis密码
-			if _, authErr := c.Do("AUTH", redisPassword); authErr != nil {
-				logger.Error("newRedisPool", zap.String("redis connection error", err.Error()))
 
-				return nil, fmt.Errorf("redis auth password error: %s", authErr)
-			}
 			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
@@ -55,9 +50,14 @@ func newRedisPool() *redis.Pool {
 			}
 			return nil
 		},
-	}
+	}, err
 }
 
-func GetRedisConn() redis.Conn {
-	return newRedisPool().Get()
+func GetRedisConn() (conn redis.Conn, err error) {
+	var pool *redis.Pool
+	if pool, err = newRedisPool(); err != nil {
+		return nil, err
+	}
+
+	return pool.Get(), nil
 }
