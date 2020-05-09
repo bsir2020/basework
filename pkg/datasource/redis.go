@@ -46,8 +46,9 @@ func newRedisPool() (redisPool *redis.Pool, err error) {
 			if err != nil {
 				logger.Error("newRedisPool", zap.String("redis connection error", err.Error()))
 
-				return fmt.Errorf("ping redis error: %s", err)
+				//return fmt.Errorf("ping redis error: %s", err)
 			}
+
 			return nil
 		},
 	}, err

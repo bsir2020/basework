@@ -31,7 +31,7 @@ func New() (jwt *JWT) {
 	return
 }
 
-func (j *JWT) CreateToken(userid int64, exptime int64) (res Token) {
+func (j *JWT) CreateToken(userid int64, exptime int64) (res Token, err error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	//claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix() //过期时间
@@ -44,7 +44,9 @@ func (j *JWT) CreateToken(userid int64, exptime int64) (res Token) {
 	tokenString, err := token.SignedString([]byte(j.signingKey))
 	if err != nil {
 		fmt.Print("Error while signing the token")
-		authLog.Fatal("CreateToken", zap.String("Error while signing the token", err.Error()))
+		authLog.Error("CreateToken", zap.String("Error while signing the token", err.Error()))
+
+		return
 	}
 
 	res = Token{tokenString}
