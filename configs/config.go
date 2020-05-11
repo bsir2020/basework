@@ -77,7 +77,7 @@ func init() {
 
 	_, err := toml.DecodeFile(confPath, &EnvConfig)
 	if err != nil {
-		fmt.Println(err.Error())
+		panic("no found config file")
 	} else {
 		WhiteList = make(map[string]string)
 

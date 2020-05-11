@@ -79,10 +79,12 @@ func (j *JWT) TokenIsInvalid(tokenString string) bool {
 	} else {
 		//校验下token是否过期
 		if res := claims.VerifyExpiresAt(time.Now().Unix(), true); res == false {
+			authLog.Error("TokenIsInvalid", zap.String("token is expired", err.Error()))
 			return true
 		}
 
 		if res := claims.VerifyIssuedAt(time.Now().Unix(), true); res == false {
+			authLog.Error("TokenIsInvalid", zap.String("token is expired", err.Error()))
 			return true
 		}
 
