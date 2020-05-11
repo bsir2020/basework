@@ -55,12 +55,11 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		//isOK = true
 
-		var err error
+		errno := &api.Errno{}
 		//解密
 		if configs.EnvConfig.RunMode != 1 {
-			a, err = rsa.RsaDecrypt(a)
-			if err != nil {
-				fmt.Println(api.RSADecERR.Message, err.Error())
+			a, errno = rsa.RsaDecrypt(a)
+			if errno != nil {
 				f.buildResponse(api.RSADecERR.Code, false, api.RSADecERR.Message, c)
 				return
 			}
