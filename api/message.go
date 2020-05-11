@@ -30,9 +30,9 @@ var (
 
 	// 数据库错误, 前缀为 101
 	DBMrgErr  = &Errno{Code: 1011, Message: "数据库管理器生成异常"}
-	DBConnErr = &Errno{Code: 1011, Message: "数据库连接异常"}
-	DBRunErr  = &Errno{Code: 1012, Message: "数据库运行时异常"}
-	DBLogErr  = &Errno{Code: 1013, Message: "数据库日志文件生成异常"}
+	DBConnErr = &Errno{Code: 1012, Message: "数据库连接异常"}
+	DBRunErr  = &Errno{Code: 1013, Message: "数据库运行时异常"}
+	DBLogErr  = &Errno{Code: 1014, Message: "数据库日志文件生成异常"}
 
 	// 认证错误, 前缀是 102
 	AuthErr      = &Errno{Code: 1021, Message: "验证失败"}
