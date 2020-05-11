@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"github.com/bsir2020/basework/api"
 )
 
 type Config struct {
@@ -71,20 +72,23 @@ var (
 func init() {
 	flag.StringVar(&env, "env", "dev", "set running env")
 	flag.StringVar(&logfile, "logfile", "", "set log file")
-	//flag.StringVar(&sqlfile, "sqllog", "sql", "set sql log file")
+	flag.StringVar(&sqlfile, "sqllog", "", "set sql log file")
 
 	confPath = "./configs/datasources-" + env + ".toml"
 
 	_, err := toml.DecodeFile(confPath, &EnvConfig)
 	if err != nil {
-		panic("no found config file")
+		panic(api.SysConfigErr)
 	} else {
 		WhiteList = make(map[string]string)
 
 		if logfile != "" {
 			EnvConfig.Log.Logfile = logfile
 		}
-		//EnvConfig.Log.Sqlog = "./" + sqlfile
+
+		if sqlfile != "" {
+			EnvConfig.Log.Sqlog = sqlfile
+		}
 
 		fmt.Println(EnvConfig.Desc)
 

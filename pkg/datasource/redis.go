@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"fmt"
+	"github.com/bsir2020/basework/api"
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/garyburd/redigo/redis"
@@ -26,7 +27,7 @@ func init() {
 	db = cfg.EnvConfig.Redis.DB
 }
 
-func newRedisPool() (redisPool *redis.Pool, err error) {
+func newRedisPool() (redisPool *redis.Pool) {
 	logger := log.New()
 
 	return &redis.Pool{
@@ -35,7 +36,7 @@ func newRedisPool() (redisPool *redis.Pool, err error) {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword))
 			if err != nil {
-				logger.Error("RedisPool", zap.String("redis connection error", err.Error()))
+				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
 			}
 
@@ -44,20 +45,21 @@ func newRedisPool() (redisPool *redis.Pool, err error) {
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			_, err := c.Do("PING")
 			if err != nil {
-				logger.Error("RedisPool", zap.String("redis connection error", err.Error()))
+				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
 
 				return fmt.Errorf("ping redis error: %s", err)
 			}
 			return nil
 		},
-	}, err
+	}
 }
 
-func GetRedisConn() (conn redis.Conn, err error) {
-	var pool *redis.Pool
-	if pool, err = newRedisPool(); err != nil {
-		return nil, err
+func GetRedisConn() (redis.Conn, *api.Errno) {
+	var pool = newRedisPool()
+	if conn, err := pool.Dial(); err != nil {
+		fmt.Println(api.RedisConnErr, err.Error())
+		return nil, api.RedisConnErr
+	} else {
+		return conn, nil
 	}
-
-	return pool.Get(), nil
 }

@@ -3,6 +3,7 @@ package datasource
 import (
 	"database/sql"
 	"fmt"
+	"github.com/bsir2020/basework/api"
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/go-xorm/xorm"
@@ -31,17 +32,18 @@ func init() {
 	logfile = cfg.EnvConfig.Log.Sqlog
 }
 
-func GetPGSql() (pgEngine *xorm.Engine, err error) {
+func GetPGSql() (pgEngine *xorm.Engine, errno *api.Errno) {
 	logger := log.New()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	pgEngine, err = xorm.NewEngine("postgres", psqlInfo)
+	pgEngine, err := xorm.NewEngine("postgres", psqlInfo)
 	if err != nil {
+		errno = api.DBMrgErr
 		println(err.Error())
-		logger.Error("GetPGSql", zap.String("create engine failed", err.Error()))
+		logger.Error("GetPGSql", zap.String(errno.Message, err.Error()))
 
 		return
 	}
@@ -49,7 +51,8 @@ func GetPGSql() (pgEngine *xorm.Engine, err error) {
 	// 设置日志
 	logFile, err := os.Create(logfile)
 	if err != nil {
-		logger.Error("GetPGSql", zap.String("create sql.log failed", err.Error()))
+		errno = api.DBLogErr
+		logger.Error("GetPGSql", zap.String(errno.Message, err.Error()))
 
 		println(err.Error())
 		return
@@ -64,9 +67,10 @@ func GetPGSql() (pgEngine *xorm.Engine, err error) {
 	pgEngine.ShowSQL(true)
 
 	if err = pgEngine.Ping(); err != nil {
-		logger.Error("GetPGSql", zap.String("database connect", err.Error()))
+		errno = api.DBConnErr
+		logger.Error("GetPGSql", zap.String(errno.Message, err.Error()))
 
-		//fmt.Printf("database connect failed : %s", err.Error())
+		fmt.Printf("database connect failed : %s", err.Error())
 	} else {
 		logger.Info("GetPGSql", zap.String("database connect ok", ""))
 		//fmt.Printf("database connect ok")
@@ -75,22 +79,24 @@ func GetPGSql() (pgEngine *xorm.Engine, err error) {
 	return
 }
 
-func GetPG() (db *sql.DB, err error) {
+func GetPG() (db *sql.DB, errno *api.Errno) {
 	logger := log.New()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err = sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		logger.Error("GETPG", zap.String("database connect failed", err.Error()))
+		errno = api.DBConnErr
+		logger.Error("GETPG", zap.String(errno.Message, err.Error()))
 		return
 	}
 
 	err = db.Ping()
 	if err != nil {
-		logger.Error("GETPG", zap.String("database connect failed", err.Error()))
+		errno = api.DBConnErr
+		logger.Error("GETPG", zap.String(errno.Message, err.Error()))
 	} else {
 		logger.Info("GETPG", zap.String("database connect ok", ""))
 		//fmt.Printf("database connect ok")

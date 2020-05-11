@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
+	"github.com/bsir2020/basework/api"
 	"image/png"
 	"strings"
 	"time"
@@ -74,11 +75,12 @@ func (this *GoogleAuth) GetSecret() string {
 }
 
 // 获取动态码
-func (this *GoogleAuth) GetCode(secret string) (string, error) {
+func (this *GoogleAuth) GetCode(secret string) (string, *api.Errno) {
 	secretUpper := strings.ToUpper(secret)
 	secretKey, err := this.base32decode(secretUpper)
 	if err != nil {
-		return "", err
+		fmt.Println(api.GoogleAuthGetErr.Message, err.Error())
+		return "", api.GoogleAuthGetErr
 	}
 	number := this.oneTimePassword(secretKey, this.toBytes(time.Now().Unix()/30))
 	return fmt.Sprintf("%06d", number), nil
@@ -100,10 +102,11 @@ func (this *GoogleAuth) GetQrcode(user, secret string) string {
 //}
 
 // 验证动态码
-func (this *GoogleAuth) VerifyCode(secret, code string) (bool, error) {
+func (this *GoogleAuth) VerifyCode(secret, code string) (bool, *api.Errno) {
 	_code, err := this.GetCode(secret)
 	if err != nil {
-		return false, err
+		fmt.Println(api.GoogleAuthVerifyErr.Message, err.Message)
+		return false, api.GoogleAuthVerifyErr
 	}
 	return _code == code, nil
 }

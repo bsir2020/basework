@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/bsir2020/basework/api"
 	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/auth"
 	"github.com/bsir2020/basework/pkg/rsa"
@@ -21,11 +22,10 @@ type loginModul struct {
 	Uid int64 `json:"uid"`
 }
 
-func (f *Filter) buildResponse(code int, status bool, errmsg string, data interface{}, c *gin.Context) {
+func (f *Filter) buildResponse(code int, status bool, data interface{}, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":      code,
 		"success":   status,
-		"err_msg":   errmsg,
 		"data":      data,
 		"timestamp": time.Now().String(),
 	})
@@ -47,7 +47,8 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		jwt := auth.New()
 		a := c.Request.Header.Get("auth")
 		if a == "" {
-			f.buildResponse(1001, false, "token为空", nil, c)
+			fmt.Println(api.TokenNilErr.Message)
+			f.buildResponse(api.TokenNilErr.Code, false, api.TokenNilErr.Message, c)
 			return
 		}
 		//e := c.Request.Header.Get("exp")
@@ -59,7 +60,8 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		if configs.EnvConfig.RunMode != 1 {
 			a, err = rsa.RsaDecrypt(a)
 			if err != nil {
-				f.buildResponse(1002, false, err.Error(), nil, c)
+				fmt.Println(api.RSADecERR.Message, err.Error())
+				f.buildResponse(api.RSADecERR.Code, false, api.RSADecERR.Message, c)
 				return
 			}
 		}
@@ -81,28 +83,29 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		//token
 		if !jwt.TokenIsInvalid(a) {
-			f.buildResponse(1004, false, "token is invalid", nil, c)
+			f.buildResponse(api.TokenInvidErr.Code, false, api.TokenInvidErr.Message, c)
 			return
 		}
 
 		loginmodul := loginModul{}
 		data, err := c.GetRawData()
 		if err != json.Unmarshal(data, &loginmodul) {
-			f.buildResponse(500, false, err.Error(), nil, c)
+			fmt.Println(api.HTTPErr.Message, api.HTTPErr, err.Error())
+			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
 			return
 		}
 
 		fmt.Println(loginmodul)
 
 		if m, err := jwt.ParseToken(a); err != nil {
-			f.buildResponse(500, false, err.Error(), nil, c)
+			f.buildResponse(err.Code, false, err.Message, c)
 			return
 		} else {
 			uid := m["uid"].(string)
 			Uid, _ := strconv.ParseInt(uid, 10, 64)
 			fmt.Println("param--> ", loginmodul)
 			if Uid != loginmodul.Uid {
-				f.buildResponse(1006, false, "user is invalid", nil, c)
+				f.buildResponse(api.HTTPUidErr.Code, false, api.HTTPUidErr.Message, c)
 				return
 			}
 		}

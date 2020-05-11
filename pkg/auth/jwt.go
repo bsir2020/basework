@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"errors"
 	"fmt"
+	"github.com/bsir2020/basework/api"
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/dgrijalva/jwt-go"
@@ -31,7 +31,7 @@ func New() (jwt *JWT) {
 	return
 }
 
-func (j *JWT) CreateToken(userid int64, exptime int64) (res Token, err error) {
+func (j *JWT) CreateToken(userid int64, exptime int64) (res Token, errno *api.Errno) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	//claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix() //过期时间
@@ -45,7 +45,7 @@ func (j *JWT) CreateToken(userid int64, exptime int64) (res Token, err error) {
 	if err != nil {
 		fmt.Print("Error while signing the token")
 		authLog.Error("CreateToken", zap.String("Error while signing the token", err.Error()))
-
+		errno = api.AuthErr
 		return
 	}
 
@@ -53,7 +53,7 @@ func (j *JWT) CreateToken(userid int64, exptime int64) (res Token, err error) {
 	return
 }
 
-func (j *JWT) ParseToken(tokenString string) (jwt.MapClaims, error) {
+func (j *JWT) ParseToken(tokenString string) (jwt.MapClaims, *api.Errno) {
 	// 解析token
 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (i interface{}, err error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -63,28 +63,29 @@ func (j *JWT) ParseToken(tokenString string) (jwt.MapClaims, error) {
 	})
 	if err != nil {
 		authLog.Error("ParseToken", zap.String("parse token error", err.Error()))
-		return nil, err
+		return nil, api.AuthParseErr
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid { // 校验token
 		return claims, nil
 	}
-	return nil, errors.New("invalid token")
+
+	return nil, api.AuthParseErr
 }
 
 //if token is invalid, method will return true
 func (j *JWT) TokenIsInvalid(tokenString string) bool {
 	claims, err := j.ParseToken(tokenString)
 	if err != nil {
-		authLog.Error("TokenIsInvalid", zap.String("valid token error", err.Error()))
+		authLog.Error("TokenIsInvalid", zap.String("valid token error", api.AuthParseErr.Message))
 	} else {
 		//校验下token是否过期
 		if res := claims.VerifyExpiresAt(time.Now().Unix(), true); res == false {
-			authLog.Error("TokenIsInvalid", zap.String("token is expired", err.Error()))
+			authLog.Error("TokenIsInvalid", zap.String("token is expired", api.AuthExp.Message))
 			return true
 		}
 
 		if res := claims.VerifyIssuedAt(time.Now().Unix(), true); res == false {
-			authLog.Error("TokenIsInvalid", zap.String("token is expired", err.Error()))
+			authLog.Error("TokenIsInvalid", zap.String("token is expired", api.AuthExp.Message))
 			return true
 		}
 
