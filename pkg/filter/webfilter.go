@@ -27,7 +27,7 @@ func (f *Filter) buildResponse(code int, status bool, data interface{}, c *gin.C
 		"code":      code,
 		"success":   status,
 		"data":      data,
-		"timestamp": time.Now().String(),
+		"timestamp": time.Now().Unix(),
 	})
 
 	c.Abort()
