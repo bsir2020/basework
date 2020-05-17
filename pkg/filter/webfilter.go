@@ -10,6 +10,7 @@ import (
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/bsir2020/basework/pkg/rsa"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	_ "go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
@@ -93,13 +94,13 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		loginmodul := loginModul{}
 		data, err := c.GetRawData()
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Error(api.HTTPParamErr.Message, zap.String(api.HTTPParamErr.Message, err.Error()))
 			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
 			return
 		}
 
 		if err = json.Unmarshal(data, &loginmodul); err != nil {
-			logger.Error(err.Error())
+			logger.Error(api.HTTPParamErr.Message, zap.String(api.HTTPParamErr.Message, err.Error()))
 			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
 			return
 		}

@@ -56,8 +56,9 @@ var (
 	RSAEncERR = &Errno{Code: 1061, Message: "加密异常"}
 
 	//http
-	HTTPErr    = &Errno{Code: 1071, Message: "http异常"}
-	HTTPUidErr = &Errno{Code: 1072, Message: "uid无效"}
+	HTTPErr      = &Errno{Code: 1071, Message: "http异常"}
+	HTTPUidErr   = &Errno{Code: 1072, Message: "uid无效"}
+	HTTPParamErr = &Errno{Code: 1073, Message: "参数异常"}
 
 	//google
 	GoogleAuthGetErr    = &Errno{Code: 1081, Message: "获取动态码异常"}
