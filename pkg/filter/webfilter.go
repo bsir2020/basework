@@ -88,7 +88,12 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 
 		loginmodul := loginModul{}
 		data, err := c.GetRawData()
-		if err != json.Unmarshal(data, &loginmodul) {
+		if err != nil {
+			fmt.Println(api.HTTPErr.Message, api.HTTPErr, err.Error())
+			return
+		}
+
+		if err = json.Unmarshal(data, &loginmodul); err != nil {
 			fmt.Println(api.HTTPErr.Message, api.HTTPErr, err.Error())
 			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
 			return
