@@ -7,13 +7,17 @@ import (
 	"github.com/bsir2020/basework/api"
 	"github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/auth"
+	"github.com/bsir2020/basework/pkg/log"
 	"github.com/bsir2020/basework/pkg/rsa"
 	"github.com/gin-gonic/gin"
+	_ "go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
 )
+
+var logger = log.New()
 
 type Filter struct {
 }
@@ -89,12 +93,13 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		loginmodul := loginModul{}
 		data, err := c.GetRawData()
 		if err != nil {
-			fmt.Println(api.HTTPErr.Message, api.HTTPErr, err.Error())
+			logger.Error(err.Error())
+			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
 			return
 		}
 
 		if err = json.Unmarshal(data, &loginmodul); err != nil {
-			fmt.Println(api.HTTPErr.Message, api.HTTPErr, err.Error())
+			logger.Error(err.Error())
 			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
 			return
 		}
