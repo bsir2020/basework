@@ -1,7 +1,9 @@
 package datasource
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/bsir2020/basework/api"
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/streadway/amqp"
@@ -183,7 +185,7 @@ func (r *RabbitMQ) RegisterProducer(producer Producer) {
 //	}
 //}
 
-func (r *RabbitMQ) SendGameFeed(msg string) {
+func (r *RabbitMQ) SendGameFeed(msg []byte) {
 	// 发送任务消息
 	err := r.channel.Publish(r.Qgamefeed, r.Qgamefeed, false, false, amqp.Publishing{
 		ContentType: "application/json",
@@ -217,19 +219,38 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 	}
 
 	for msg := range msgList {
+		rpmsg := &api.Message{}
+		json.Unmarshal(msg.Body, rpmsg)
+
 		// 处理数据
 		err := receiver.Consumer(msg.Body)
 		if err != nil {
 			//fmt.Printf("确认消息未完成异常:%s \n", err)
 			logger.Error(err.Error())
-		} else {
-			// 确认消息,必须为false
-			err = msg.Ack(true)
+			//r.channel.Nack(msg.DeliveryTag, true, true)
+			err = msg.Ack(false)
 			if err != nil {
 				//fmt.Printf("确认消息完成异常:%s \n", err)
 				logger.Error(err.Error())
-				continue
+
+				rpmsg.Status = false
 			}
+		} else {
+			rpmsg.Status = true
+
+			// 确认消息,必须为false
+			err = msg.Ack(false)
+			if err != nil {
+				//fmt.Printf("确认消息完成异常:%s \n", err)
+				logger.Error(err.Error())
+			}
+		}
+
+		//回复
+		if d, err := json.Marshal(rpmsg); err == nil {
+			r.SendGameFeed(d)
+		} else {
+			logger.Error(err.Error(), zap.String("reply", string(msg.Body)))
 		}
 	}
 }

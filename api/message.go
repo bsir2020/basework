@@ -69,3 +69,8 @@ var (
 	GoogleAuthGetErr    = &Errno{Code: 1081, Message: "获取动态码异常"}
 	GoogleAuthVerifyErr = &Errno{Code: 1081, Message: "验证动态码异常"}
 )
+
+const (
+	PREF_USER = "user:USER_"
+	PREF_WALL = "wallet:WALLET_"
+)
