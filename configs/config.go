@@ -33,15 +33,18 @@ type RedisConfig struct {
 }
 
 type RabbitmqConfig struct {
-	User     string   // mq user
-	Password string   // mq password
-	Ip       []string // mq ip
-	Port     []int    // mq port
-	Vhost    []string // vhost
-	QuName   []string // 队列名称
-	RtKey    []string // key值
-	ExName   []string // 交换机名称
-	ExType   []string // 交换机类型
+	Url       string
+	Qgame     string
+	Qgamefeed string
+	//User     string   // mq user
+	//Password string   // mq password
+	//Ip       []string // mq ip
+	//Port     []int    // mq port
+	//Vhost    []string // vhost
+	//QuName   []string // 队列名称
+	//RtKey    []string // key值
+	//ExName   []string // 交换机名称
+	//ExType   []string // 交换机类型
 }
 
 type LogConfig struct {

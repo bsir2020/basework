@@ -63,3 +63,37 @@ func GetRedisConn() (redis.Conn, *api.Errno) {
 		return conn, nil
 	}
 }
+
+//key:"lock_uid"
+//uid: user_id
+func AddLock(conn redis.Conn, key, val string, ex int) bool {
+	msg, err := redis.String(
+		conn.Do("set", key, val, "nx", "ex", 5),
+	)
+
+	if err == redis.ErrNil {
+		return false
+	}
+
+	if msg == "OK" {
+		return true
+	}
+
+	return false
+}
+
+func DelLock(conn redis.Conn, key, requestId string) bool {
+	if GetLock(conn, key) == requestId {
+		msg, _ := redis.Int64(conn.Do("del", key))
+		if msg == 1 || msg == 0 {
+			return true
+		}
+		return false
+	}
+	return false
+}
+
+func GetLock(conn redis.Conn, key string) string {
+	msg, _ := redis.String(conn.Do("get", key))
+	return msg
+}
