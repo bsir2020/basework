@@ -9,6 +9,11 @@ type Message struct {
 	Data    []byte `json:"data"`
 }
 
+type Account struct {
+	Balance  int64 `json:"balance"`  //余额
+	Unsetled int64 `json:"unsetled"` //未结算余额
+}
+
 // 定义错误码
 type Errno struct {
 	Code    int
