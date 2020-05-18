@@ -95,13 +95,13 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		data, err := c.GetRawData()
 		if err != nil {
 			logger.Error(api.HTTPParamErr.Message, zap.String(api.HTTPParamErr.Message, err.Error()))
-			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
+			f.buildResponse(api.HTTPParamErr.Code, false, api.HTTPParamErr.Message, c)
 			return
 		}
 
 		if err = json.Unmarshal(data, &loginmodul); err != nil {
 			logger.Error(api.HTTPParamErr.Message, zap.String(api.HTTPParamErr.Message, err.Error()))
-			f.buildResponse(api.HTTPErr.Code, false, api.HTTPErr.Message, c)
+			f.buildResponse(api.HTTPParamErr.Code, false, api.HTTPParamErr.Message, c)
 			return
 		}
 

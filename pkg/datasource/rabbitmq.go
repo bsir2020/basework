@@ -187,7 +187,7 @@ func (r *RabbitMQ) RegisterProducer(producer Producer) {
 
 func (r *RabbitMQ) SendGameFeed(msg []byte) {
 	// 发送任务消息
-	err := r.channel.Publish(r.Qgamefeed, r.Qgamefeed, false, false, amqp.Publishing{
+	err := r.channel.Publish("", r.Qgamefeed, false, false, amqp.Publishing{
 		ContentType: "application/json",
 		Body:        []byte(msg),
 	})
@@ -247,6 +247,7 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		}
 
 		//回复
+		rpmsg.Type = 1
 		if d, err := json.Marshal(rpmsg); err == nil {
 			r.SendGameFeed(d)
 		} else {
