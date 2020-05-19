@@ -18,7 +18,7 @@ type Producer interface {
 
 // 定义接收者接口
 type Receiver interface {
-	Consumer([]byte) error
+	Consumer([]byte) *api.Errno
 }
 
 // 定义RabbitMQ对象
@@ -223,18 +223,19 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		json.Unmarshal(msg.Body, rpmsg)
 
 		// 处理数据
-		err := receiver.Consumer(msg.Body)
-		if err != nil {
-			//fmt.Printf("确认消息未完成异常:%s \n", err)
-			logger.Error(err.Error())
-			//r.channel.Nack(msg.DeliveryTag, true, true)
+		errno := receiver.Consumer(msg.Body)
+		switch errno.Code {
+		case 0:
 			err = msg.Ack(false)
 			if err != nil {
 				//fmt.Printf("确认消息完成异常:%s \n", err)
 				logger.Error(err.Error())
 			}
 			rpmsg.Status = false
-		} else {
+		case api.MQTimeoutErr.Code:
+			r.channel.Nack(msg.DeliveryTag, true, true)
+			continue
+		default:
 			rpmsg.Status = true
 
 			// 确认消息,必须为false
@@ -244,6 +245,26 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 				logger.Error(err.Error())
 			}
 		}
+		//if err != nil {
+		//	//fmt.Printf("确认消息未完成异常:%s \n", err)
+		//	logger.Error(err.Error())
+		//	//r.channel.Nack(msg.DeliveryTag, true, true)
+		//	err = msg.Ack(false)
+		//	if err != nil {
+		//		//fmt.Printf("确认消息完成异常:%s \n", err)
+		//		logger.Error(err.Error())
+		//	}
+		//	rpmsg.Status = false
+		//} else {
+		//	rpmsg.Status = true
+		//
+		//	// 确认消息,必须为false
+		//	err = msg.Ack(false)
+		//	if err != nil {
+		//		//fmt.Printf("确认消息完成异常:%s \n", err)
+		//		logger.Error(err.Error())
+		//	}
+		//}
 
 		//回复
 		rpmsg.Type = 1

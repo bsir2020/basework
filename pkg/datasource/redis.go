@@ -83,14 +83,14 @@ func AddLock(conn redis.Conn, val string) bool {
 }
 
 func DelLock(conn redis.Conn, val string) bool {
-	if GetLock(conn, "lock_"+val) == val {
-		msg, _ := redis.Int64(conn.Do("del", "lock:LOCK_"+val))
-		if msg == 1 || msg == 0 {
-			return true
-		}
-		return false
+	//if GetLock(conn, val) == val {
+	msg, _ := redis.Int64(conn.Do("del", "lock:LOCK_"+val))
+	if msg == 1 || msg == 0 {
+		return true
 	}
 	return false
+	//}
+	//return false
 }
 
 func GetLock(conn redis.Conn, val string) string {
