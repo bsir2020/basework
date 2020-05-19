@@ -225,18 +225,18 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		// 处理数据
 		errno := receiver.Consumer(msg.Body)
 		switch errno.Code {
-		case 0:
+		case api.OK.Code:
 			err = msg.Ack(false)
 			if err != nil {
 				//fmt.Printf("确认消息完成异常:%s \n", err)
 				logger.Error(err.Error())
 			}
-			rpmsg.Status = false
+			rpmsg.Status = true
 		case api.MQTimeoutErr.Code:
 			r.channel.Nack(msg.DeliveryTag, true, true)
 			continue
 		default:
-			rpmsg.Status = true
+			rpmsg.Status = false
 
 			// 确认消息,必须为false
 			err = msg.Ack(false)
