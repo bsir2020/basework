@@ -67,7 +67,10 @@ var (
 
 	//google
 	GoogleAuthGetErr    = &Errno{Code: 1081, Message: "获取动态码异常"}
-	GoogleAuthVerifyErr = &Errno{Code: 1081, Message: "验证动态码异常"}
+	GoogleAuthVerifyErr = &Errno{Code: 1082, Message: "验证动态码异常"}
+
+	//mq
+	MQErr = &Errno{Code: 1091, Message: "获取动态码异常"}
 )
 
 const (

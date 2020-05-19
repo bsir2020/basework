@@ -232,9 +232,8 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 			if err != nil {
 				//fmt.Printf("确认消息完成异常:%s \n", err)
 				logger.Error(err.Error())
-
-				rpmsg.Status = false
 			}
+			rpmsg.Status = false
 		} else {
 			rpmsg.Status = true
 
