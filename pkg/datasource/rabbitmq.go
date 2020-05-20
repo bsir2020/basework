@@ -228,8 +228,7 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		case api.OK.Code:
 			err = msg.Ack(false)
 			if err != nil {
-				//fmt.Printf("确认消息完成异常:%s \n", err)
-				logger.Error(err.Error())
+				logger.Error("确认消息完成异常 " + err.Error())
 			}
 			rpmsg.Status = true
 		case api.MQTimeoutErr.Code:
@@ -238,33 +237,11 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		default:
 			rpmsg.Status = false
 
-			// 确认消息,必须为false
 			err = msg.Ack(false)
 			if err != nil {
-				//fmt.Printf("确认消息完成异常:%s \n", err)
-				logger.Error(err.Error())
+				logger.Error("确认消息完成异常 " + err.Error())
 			}
 		}
-		//if err != nil {
-		//	//fmt.Printf("确认消息未完成异常:%s \n", err)
-		//	logger.Error(err.Error())
-		//	//r.channel.Nack(msg.DeliveryTag, true, true)
-		//	err = msg.Ack(false)
-		//	if err != nil {
-		//		//fmt.Printf("确认消息完成异常:%s \n", err)
-		//		logger.Error(err.Error())
-		//	}
-		//	rpmsg.Status = false
-		//} else {
-		//	rpmsg.Status = true
-		//
-		//	// 确认消息,必须为false
-		//	err = msg.Ack(false)
-		//	if err != nil {
-		//		//fmt.Printf("确认消息完成异常:%s \n", err)
-		//		logger.Error(err.Error())
-		//	}
-		//}
 
 		//回复
 		rpmsg.Type = 1
