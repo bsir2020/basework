@@ -70,7 +70,7 @@ var (
 	GoogleAuthVerifyErr = &Errno{Code: 1082, Message: "验证动态码异常"}
 
 	//mq
-	MQTimeoutErr = &Errno{Code: 1091, Message: "timeout"}
+	MQSyncErr    = &Errno{Code: 1091, Message: "需要同步"}
 	MQProcessErr = &Errno{Code: 1092, Message: "消息处理异常"}
 )
 
