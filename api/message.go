@@ -71,7 +71,7 @@ var (
 
 	//mq
 	MQTimeoutErr = &Errno{Code: 1091, Message: "timeout"}
-	MQProcessErr = &Errno{Code: 1091, Message: "消息处理异常"}
+	MQProcessErr = &Errno{Code: 1092, Message: "消息处理异常"}
 )
 
 const (
