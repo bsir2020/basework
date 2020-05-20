@@ -234,6 +234,8 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 			r.channel.Nack(msg.DeliveryTag, true, true)
 			continue
 		default:
+			logger.Error("消息处理异常 " + err.Error())
+
 			rpmsg.Status = false
 
 			err = msg.Ack(false)
