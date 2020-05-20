@@ -230,11 +230,13 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 				logger.Error("确认消息完成异常 " + err.Error())
 			}
 			rpmsg.Status = true
+			logger.Info("消息处理完成", zap.String("ack", string(msg.Body)))
 		case api.MQSyncErr.Code:
 			r.channel.Nack(msg.DeliveryTag, true, true)
+			logger.Info("消息重发", zap.String("nack", string(msg.Body)))
 			continue
 		default:
-			logger.Error("消息处理异常 " + err.Error())
+			logger.Info("消息处理异常", zap.String("exception", string(msg.Body)))
 
 			rpmsg.Status = false
 
