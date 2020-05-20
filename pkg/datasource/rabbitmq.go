@@ -60,7 +60,6 @@ type Queue struct {
 
 // 链接rabbitMQ
 func (r *RabbitMQ) mqConnect() {
-	//RabbitUrl := fmt.Sprintf("amqp://%s:%s@%s:%d/%s", r.user, r.password, r.ip, r.port, r.vhost)
 	var err error
 	r.connection, err = amqp.Dial(r.Url)
 	if err != nil {
@@ -79,6 +78,7 @@ func (r *RabbitMQ) mqClose() {
 	err := r.channel.Close()
 	if err != nil {
 		fmt.Printf("MQ管道关闭失败:%s \n", err)
+		logger.Error("MQ管道关闭失败 " + err.Error())
 	}
 	err = r.connection.Close()
 	if err != nil {
@@ -192,7 +192,7 @@ func (r *RabbitMQ) SendGameFeed(msg []byte) {
 		Body:        []byte(msg),
 	})
 	if err != nil {
-		fmt.Printf("MQ任务发送失败:%s \n", err)
+		logger.Error("MQ任务发送失败 " + err.Error())
 		return
 	}
 }
@@ -213,8 +213,7 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 	//err := r.channel.Qos(1, 0, true)
 	msgList, err := r.channel.Consume(r.Qgame, "", false, false, false, false, nil)
 	if err != nil {
-		//fmt.Printf("获取消费通道异常:%s \n", err)
-		logger.Error(err.Error())
+		logger.Error("获取消费通道异常 " + err.Error())
 		return
 	}
 
