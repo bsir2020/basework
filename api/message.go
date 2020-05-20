@@ -58,7 +58,7 @@ var (
 
 	//加解密
 	RSADecERR = &Errno{Code: 1061, Message: "解密异常"}
-	RSAEncERR = &Errno{Code: 1061, Message: "加密异常"}
+	RSAEncERR = &Errno{Code: 1062, Message: "加密异常"}
 
 	//http
 	HTTPErr      = &Errno{Code: 1071, Message: "http异常"}
