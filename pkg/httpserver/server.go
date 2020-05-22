@@ -32,10 +32,10 @@ func New() *Server {
 	}
 
 	e := gin.Default()
+	e.Use(cross())
 
 	filter := filter.Filter{}
 	e.Use(filter.Checkauth())
-	e.Use(cross())
 	e.Use(gin.Logger())
 	e.Use(gin.Recovery())
 	e.NoRoute(noResponse)
