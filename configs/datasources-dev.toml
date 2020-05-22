@@ -40,5 +40,9 @@ publickey = "./scripts/public_key.pem"
 [fillter]
 array = ["/login/","/getToken/"]
 
+[es]
+url = "http://192.168.0.222:9200"
+logfile = "./eslog.log"
+
 
 

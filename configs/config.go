@@ -15,7 +15,13 @@ type Config struct {
 	Log      *LogConfig
 	Authkey  *AuthkeyConfig
 	Fillter  *FillterConfig
+	ES       *ESConfig
 	RunMode  int
+}
+
+type ESConfig struct {
+	Url     string
+	LogFile string
 }
 
 type PgSqlConfig struct {
