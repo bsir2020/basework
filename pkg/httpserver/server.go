@@ -113,15 +113,16 @@ func (s *Server) Run(ip string, port int64) {
 func (s *Server) cross() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
-
 		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+		c.Header("Access-Control-Allow-Headers", "*")
+		//c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
 		c.Header("Access-Control-Allow-Credentials", "true")
 
 		if method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
+			//c.AbortWithStatus(http.StatusNoContent)
+			c.AbortWithStatus(http.StatusOK)
 		}
 
 		// 处理请求
