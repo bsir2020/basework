@@ -35,6 +35,10 @@ func New() *Server {
 
 	filter := filter.Filter{}
 	e.Use(filter.Checkauth())
+	e.Use(cross())
+	e.Use(gin.Logger())
+	e.Use(gin.Recovery())
+	e.NoRoute(noResponse)
 
 	return &Server{
 		engine:     e,
@@ -102,15 +106,11 @@ func (s *Server) AddHandleByGroup(group *gin.RouterGroup, route string, methodTy
 }
 
 func (s *Server) Run(ip string, port int64) {
-	s.engine.Use(s.cross())
-	s.engine.Use(gin.Logger())
-	s.engine.Use(gin.Recovery())
-	s.engine.NoRoute(s.noResponse)
 	s.assem()
 	s.engine.Run(ip + ":" + strconv.FormatInt(port, 10))
 }
 
-func (s *Server) cross() gin.HandlerFunc {
+func cross() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
 		c.Header("Access-Control-Allow-Origin", "*")
@@ -130,7 +130,7 @@ func (s *Server) cross() gin.HandlerFunc {
 	}
 }
 
-func (s *Server) noResponse(c *gin.Context) {
+func noResponse(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{
 		"status": 404,
 		"error":  "404, page not exists!",
