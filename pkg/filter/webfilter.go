@@ -108,15 +108,12 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println(loginmodul)
-
 		if m, err := jwt.ParseToken(a); err != nil {
 			f.buildResponse(err.Code, false, err.Message, c)
 			return
 		} else {
 			uid := m["uid"].(string)
 			Uid, _ := strconv.ParseInt(uid, 10, 64)
-			fmt.Println("param--> ", loginmodul)
 			if Uid != loginmodul.Uid {
 				f.buildResponse(api.HTTPUidErr.Code, false, api.HTTPUidErr.Message, c)
 				return

@@ -2,7 +2,6 @@ package datasource
 
 import (
 	"context"
-	"fmt"
 	"github.com/bsir2020/basework/configs"
 	"github.com/olivere/elastic/v7"
 	"log"
