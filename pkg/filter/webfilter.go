@@ -94,7 +94,7 @@ func (f *Filter) Checkauth() gin.HandlerFunc {
 		loginmodul := loginModul{}
 		data, err := c.GetRawData()
 		if configs.EnvConfig.RunMode == 1 {
-			fmt.Printf("---->parame:%s", data)
+			fmt.Printf("---->parame:%s \n", data)
 		}
 		if err != nil {
 			logger.Error(api.HTTPParamErr.Message, zap.String(api.HTTPParamErr.Message, err.Error()))
