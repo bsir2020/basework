@@ -102,11 +102,11 @@ func (s *Server) AddHandleByGroup(group *gin.RouterGroup, route string, methodTy
 }
 
 func (s *Server) Run(ip string, port int64) {
-	s.assem()
 	s.engine.Use(s.cross())
 	s.engine.Use(gin.Logger())
 	s.engine.Use(gin.Recovery())
 	s.engine.NoRoute(s.noResponse)
+	s.assem()
 	s.engine.Run(ip + ":" + strconv.FormatInt(port, 10))
 }
 
