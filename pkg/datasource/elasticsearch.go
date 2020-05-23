@@ -1,11 +1,8 @@
 package datasource
 
 import (
-	"context"
 	"github.com/bsir2020/basework/configs"
 	elastic "github.com/elastic/go-elasticsearch/v7"
-	"log"
-	"os"
 )
 
 var (
