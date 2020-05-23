@@ -8,6 +8,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/garyburd/redigo v1.6.0
 	github.com/gin-gonic/gin v1.6.2
+	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/go-xorm/xorm v0.7.9
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v1.3.0

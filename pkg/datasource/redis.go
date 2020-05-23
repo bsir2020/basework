@@ -42,8 +42,12 @@ func newRedisPool() (redisPool *redis.Pool) {
 
 			return c, err
 		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
+		TestOnBorrow: func(c redis.Conn, t time.Time) (err error) {
+			for i := 0; i < 3; i++ {
+				_, err = c.Do("PING")
+				time.Sleep(time.Second * 1)
+			}
+
 			if err != nil {
 				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
 
