@@ -3,7 +3,7 @@ package datasource
 import (
 	"context"
 	"github.com/bsir2020/basework/configs"
-	"github.com/olivere/elastic/v7"
+	elastic "github.com/elastic/go-elasticsearch/v7"
 	"log"
 	"os"
 )
@@ -11,11 +11,15 @@ import (
 var (
 	url     string
 	logFile string
+	user string
+	passwd string
 )
 
 func init() {
 	url = configs.EnvConfig.ES.Url
 	logFile = configs.EnvConfig.ES.LogFile
+	user = configs.EnvConfig.ES.User
+	passwd = configs.EnvConfig.ES.Passwd
 }
 
 type ESClient struct {
@@ -23,20 +27,13 @@ type ESClient struct {
 }
 
 func GetEsClient() (client *ESClient, err error) {
-	lf, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
-	if err != nil {
-		panic(err.Error())
+	esConfig := &elastic.Config{
+		Addresses: []string{url},
+		Username: user,
+		Password: passwd,
 	}
 
-	cfg := []elastic.ClientOptionFunc{
-		elastic.SetURL(url),
-		elastic.SetSniff(false),
-		elastic.SetInfoLog(log.New(lf, "ES-INFO: ", 0)),
-		elastic.SetTraceLog(log.New(lf, "ES-TRACE: ", 0)),
-		elastic.SetErrorLog(log.New(lf, "ES-ERROR: ", 0)),
-	}
-
-	esclient, err := elastic.NewClient(cfg...)
+	esclient, err := elastic.NewClient(*esConfig)
 	if esclient != nil {
 		return &ESClient{
 			client: esclient,
@@ -46,10 +43,3 @@ func GetEsClient() (client *ESClient, err error) {
 	return nil, err
 }
 
-func (e *ESClient) Add(index, typ string, id string, data interface{}) (*elastic.IndexResponse, error) {
-	return e.client.Index().Index(index).Type(typ).Id(id).BodyJson(data).Do(context.Background())
-}
-
-func (e *ESClient) Get(index, typ string, id string, data interface{}) (*elastic.IndexResponse, error) {
-	return e.client.Index().Index(index).Type(typ).Id(id).Do(context.Background())
-}

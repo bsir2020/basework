@@ -7,7 +7,7 @@ import (
 	"github.com/bsir2020/basework/api"
 )
 
-type Config struct {
+type config struct {
 	Desc     string
 	Pgsql    *PgSqlConfig
 	Redis    *RedisConfig
@@ -21,6 +21,8 @@ type Config struct {
 
 type ESConfig struct {
 	Url     string
+	User string
+	Passwd string
 	LogFile string
 }
 
@@ -74,7 +76,7 @@ var (
 	env       string
 	logfile   string
 	sqlfile   string
-	EnvConfig *Config
+	EnvConfig *config
 	WhiteList map[string]string
 )
 
