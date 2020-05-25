@@ -11,14 +11,16 @@ import (
 )
 
 const (
-	redisMaxIdle        = 3   //最大空闲连接数
-	redisIdleTimeoutSec = 100 //最大空闲连接时间
+	redisMaxIdle        = 30   //最大空闲连接数
+	redisIdleTimeoutSec = 60 //最大空闲连接时间
+	maxActive = 1000
 )
 
 var (
 	redisURL      string
 	redisPassword string
 	db            int
+	timeout =  2
 )
 
 func init() {
@@ -32,9 +34,14 @@ func newRedisPool() (redisPool *redis.Pool) {
 
 	return &redis.Pool{
 		MaxIdle:     redisMaxIdle,
+		MaxActive:   maxActive,
 		IdleTimeout: redisIdleTimeoutSec * time.Second,
+		Wait:        true,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword))
+			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword),
+				redis.DialConnectTimeout(time.Duration(timeout) * time.Second),
+				redis.DialReadTimeout(time.Duration(timeout) *time.Second),
+				redis.DialWriteTimeout(time.Duration(timeout) *time.Second))
 			if err != nil {
 				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
@@ -43,36 +50,28 @@ func newRedisPool() (redisPool *redis.Pool) {
 			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) (err error) {
-			for i := 0; i < 3; i++ {
-				_, err = c.Do("PING")
-				time.Sleep(time.Millisecond * 300)
+			if time.Since(t) < time.Minute {
+				return nil
 			}
 
+			_, err = c.Do("PING")
 			if err != nil {
 				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
-
-				return fmt.Errorf("ping redis error: %s", err)
 			}
-			return nil
+			return err
 		},
 	}
 }
 
 func GetRedisConn() (redis.Conn, *api.Errno) {
-	var pool = newRedisPool()
-	if conn, err := pool.Dial(); err != nil {
-		fmt.Println(api.RedisConnErr, err.Error())
-		return nil, api.RedisConnErr
-	} else {
-		return conn, nil
-	}
+	return newRedisPool().Get(), nil
 }
 
 //key:"lock_uid"
 //uid: user_id
-func AddLock(conn redis.Conn, val string) bool {
+func AddLock(val string) bool {
 	msg, err := redis.String(
-		conn.Do("set", "lock:LOCK_"+val, val, "nx", "ex", 4),
+		Exec("set", "lock:LOCK_"+val, val, "nx", "ex", 4),
 	)
 
 	if err == redis.ErrNil {
@@ -86,11 +85,33 @@ func AddLock(conn redis.Conn, val string) bool {
 	return false
 }
 
-func DelLock(conn redis.Conn, val string) {
-	conn.Do("del", "lock:LOCK_"+val)
+func DelLock(val string) {
+	_, err := Exec("del", "lock:LOCK_"+val)
+	if err != nil{
+		fmt.Println(api.RedisConnErr, err.Error())
+	}
 }
 
-func GetLock(conn redis.Conn, val string) string {
-	msg, _ := redis.String(conn.Do("get", "lock:LOCK_"+val))
-	return msg
+//func GetLock(conn redis.Conn, val string) string {
+//	defer conn.Close()
+//
+//	msg, _ := redis.String(conn.Do("get", "lock:LOCK_"+val))
+//	return msg
+//}
+
+func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
+	con, _ := GetRedisConn()
+	if err := con.Err(); err != nil {
+		return nil, err
+	}
+	defer con.Close()
+	parmas := make([]interface{}, 0)
+	parmas = append(parmas, key)
+
+	if len(args) > 0 {
+		for _, v := range args {
+			parmas = append(parmas, v)
+		}
+	}
+	return con.Do(cmd, parmas...)
 }

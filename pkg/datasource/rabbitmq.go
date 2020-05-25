@@ -227,7 +227,7 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		case api.OK.Code:
 			err = msg.Ack(false)
 			if err != nil {
-				logger.Error("确认消息完成异常 " + err.Error())
+				logger.Error("确认消息异常 " + err.Error())
 			}
 			rpmsg.Status = true
 			logger.Info("消息处理完成", zap.String("ack", string(msg.Body)))
@@ -242,7 +242,7 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 
 			err = msg.Ack(false)
 			if err != nil {
-				logger.Error("确认消息完成异常 " + err.Error())
+				logger.Error("确认消息异常 " + err.Error())
 			}
 		}
 
