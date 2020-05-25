@@ -70,13 +70,9 @@ func GetRedisConn() (redis.Conn, *api.Errno) {
 //key:"lock_uid"
 //uid: user_id
 func AddLock(val string) bool {
-	msg, err := redis.String(
+	msg, _ := redis.String(
 		Exec("set", "lock:LOCK_"+val, val, "nx", "ex", 4),
 	)
-
-	if err == redis.ErrNil {
-		return false
-	}
 
 	if msg == "OK" {
 		return true
