@@ -77,4 +77,5 @@ var (
 const (
 	PREF_USER = "user:USER_"
 	PREF_WALL = "wallet:WALLET_"
+	PREF_TOKEN = "token:USER_"
 )

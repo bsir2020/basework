@@ -12,7 +12,7 @@ import (
 
 const (
 	redisMaxIdle        = 30   //最大空闲连接数
-	redisIdleTimeoutSec = 60 //最大空闲连接时间
+	redisIdleTimeoutSec = 100 //最大空闲连接时间
 	maxActive = 1000
 )
 
@@ -20,7 +20,7 @@ var (
 	redisURL      string
 	redisPassword string
 	db            int
-	timeout =  2
+	timeout = 2
 )
 
 func init() {
@@ -40,8 +40,8 @@ func newRedisPool() (redisPool *redis.Pool) {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword),
 				redis.DialConnectTimeout(time.Duration(timeout) * time.Second),
-				redis.DialReadTimeout(time.Duration(timeout) *time.Second),
-				redis.DialWriteTimeout(time.Duration(timeout) *time.Second))
+				redis.DialReadTimeout(time.Duration(timeout) * time.Second),
+				redis.DialWriteTimeout(time.Duration(timeout) * time.Second))
 			if err != nil {
 				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
