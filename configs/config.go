@@ -17,7 +17,7 @@ type config struct {
 	Fillter  *FillterConfig
 	ES       *ESConfig
 	RunMode  int
-	concurnum int
+	Concurnum int
 }
 
 type ESConfig struct {
