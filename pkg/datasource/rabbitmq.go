@@ -207,7 +207,7 @@ func (r *RabbitMQ) RegisterReceiver(receiver Receiver) {
 // 监听接收者接收任务
 func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 	// 处理结束关闭链接
-	defer r.mqClose()
+	//defer r.mqClose()
 
 	// 获取消费通道,确保rabbitMQ一个一个发送消息
 	//err := r.channel.Qos(1, 0, true)
