@@ -206,6 +206,9 @@ func (r *RabbitMQ) RegisterReceiver(receiver Receiver) {
 
 // 监听接收者接收任务
 func (r *RabbitMQ) listenReceiver(receiver Receiver) {
+	if r.channel == nil {
+		r.mqConnect()
+	}
 	// 处理结束关闭链接
 	//defer r.mqClose()
 
