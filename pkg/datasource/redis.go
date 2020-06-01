@@ -13,7 +13,6 @@ import (
 const (
 	redisMaxIdle        = 30   //最大空闲连接数
 	redisIdleTimeoutSec = 100 //最大空闲连接时间
-	maxActive = 1000
 )
 
 var (
@@ -21,12 +20,14 @@ var (
 	redisPassword string
 	db            int
 	timeout = 2
+	maxActive int
 )
 
 func init() {
 	redisURL = cfg.EnvConfig.Redis.Hosts[0]
 	redisPassword = cfg.EnvConfig.Redis.Password
 	db = cfg.EnvConfig.Redis.DB
+	maxActive = cfg.EnvConfig.Redis.MaxActive
 }
 
 func newRedisPool() (redisPool *redis.Pool) {

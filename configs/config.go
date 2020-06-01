@@ -39,6 +39,7 @@ type RedisConfig struct {
 	Hosts    []string
 	Password string
 	DB       int
+	MaxActive int
 }
 
 type RabbitmqConfig struct {

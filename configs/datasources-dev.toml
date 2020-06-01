@@ -12,6 +12,7 @@ dbname = "postgres"
 [redis]
 hosts = ["redis://192.168.1.222:6379"]
 password = "xjwl"
+maxActive = 1000
 db = 0
 
 [rabbitmq]
