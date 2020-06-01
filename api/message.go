@@ -5,6 +5,7 @@ type Message struct {
 	Subject string `json:"subject"`
 	Type    int    `json:"type"` //#0发起 1反馈
 	Status  bool   `json:"status"`
+	GameId int64  `json:"id"`
 	Id      int64  `json:"id"`
 	Data    []byte `json:"data"`
 }
