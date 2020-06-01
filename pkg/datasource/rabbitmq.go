@@ -109,6 +109,8 @@ func New() *RabbitMQ {
 
 // 启动RabbitMQ客户端,并初始化
 func (r *RabbitMQ) Start() {
+	wg := sync.WaitGroup{}
+
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println(err)
@@ -131,7 +133,8 @@ func (r *RabbitMQ) Start() {
 	//}
 	// 开启监听接收者接收任务
 	for _, receiver := range r.receiverList {
-		go r.listenReceiver(receiver)
+		wg.Add(1)
+		go r.listenReceiver(receiver, &wg)
 	}
 }
 
@@ -205,7 +208,7 @@ func (r *RabbitMQ) RegisterReceiver(receiver Receiver) {
 }
 
 // 监听接收者接收任务
-func (r *RabbitMQ) listenReceiver(receiver Receiver) {
+func (r *RabbitMQ) listenReceiver(receiver Receiver, wg *sync.WaitGroup) {
 	if r.channel == nil {
 		r.mqConnect()
 	}
@@ -219,6 +222,9 @@ func (r *RabbitMQ) listenReceiver(receiver Receiver) {
 		logger.Error("获取消费通道异常 " + err.Error())
 		return
 	}
+
+	wg.Done()
+	wg.Wait()
 
 	for msg := range msgList {
 		rpmsg := &api.Message{}
