@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	redisMaxIdle        = 30   //最大空闲连接数
-	redisIdleTimeoutSec = 100 //最大空闲连接时间
+	redisMaxIdle        = 3000   //最大空闲连接数
+	redisIdleTimeoutSec = 360 //最大空闲连接时间
 )
 
 var (
