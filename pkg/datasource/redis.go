@@ -101,7 +101,7 @@ func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error)
 	if err := con.Err(); err != nil {
 		return nil, err
 	}
-	defer con.Close()
+	//defer con.Close()
 	parmas := make([]interface{}, 0)
 	parmas = append(parmas, key)
 
