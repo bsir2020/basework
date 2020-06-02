@@ -104,7 +104,7 @@ func DelLock(val string) {
 //	return msg
 //}
 
-func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
+func RedisExec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
 	con, _ := GetRedisConn()
 	defer con.Close()
 	parmas := make([]interface{}, 0)
@@ -118,7 +118,7 @@ func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error)
 	return con.Do(cmd, parmas...)
 }
 
-func ClosePool() {
+func CloseReidsPool() {
 	pool := newRedisPool()
 	pool.Close()
 }
