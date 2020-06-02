@@ -5,22 +5,19 @@ import (
 	"github.com/bsir2020/basework/api"
 	cfg "github.com/bsir2020/basework/configs"
 	"github.com/bsir2020/basework/pkg/log"
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	"go.uber.org/zap"
 	"time"
 )
 
-const (
-	redisMaxIdle        = 3000   //最大空闲连接数
-	redisIdleTimeoutSec = 360 //最大空闲连接时间
-)
-
 var (
-	redisURL      string
-	redisPassword string
-	db            int
-	timeout = 2
-	maxActive int
+	redisURL       string
+	redisPassword  string
+	db             int
+	timeout        = 2
+	maxActive      int
+	maxIdle        int
+	idleTimeoutSec int
 )
 
 func init() {
@@ -28,21 +25,23 @@ func init() {
 	redisPassword = cfg.EnvConfig.Redis.Password
 	db = cfg.EnvConfig.Redis.DB
 	maxActive = cfg.EnvConfig.Redis.MaxActive
+	maxIdle = cfg.EnvConfig.Redis.MaxIdle
+	idleTimeoutSec = cfg.EnvConfig.Redis.IdleTimeoutSec
 }
 
 func newRedisPool() (redisPool *redis.Pool) {
 	logger := log.New()
 
 	return &redis.Pool{
-		MaxIdle:     redisMaxIdle,
+		MaxIdle:     maxIdle,
 		MaxActive:   maxActive,
-		IdleTimeout: redisIdleTimeoutSec * time.Second,
+		IdleTimeout: time.Duration(idleTimeoutSec) * time.Second,
 		Wait:        true,
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword),
-				redis.DialConnectTimeout(time.Duration(timeout) * time.Second),
-				redis.DialReadTimeout(time.Duration(timeout) * time.Second),
-				redis.DialWriteTimeout(time.Duration(timeout) * time.Second))
+				redis.DialConnectTimeout(time.Duration(timeout)*time.Second),
+				redis.DialReadTimeout(time.Duration(timeout)*time.Second),
+				redis.DialWriteTimeout(time.Duration(timeout)*time.Second))
 			if err != nil {
 				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
 				return nil, fmt.Errorf("redis connection error: %s", err)
@@ -84,7 +83,7 @@ func AddLock(val string) bool {
 
 func DelLock(val string) {
 	_, err := Exec("del", "lock:LOCK_"+val)
-	if err != nil{
+	if err != nil {
 		fmt.Println(api.RedisConnErr, err.Error())
 	}
 }
@@ -101,7 +100,7 @@ func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error)
 	if err := con.Err(); err != nil {
 		return nil, err
 	}
-	//defer con.Close()
+	defer con.Close()
 	parmas := make([]interface{}, 0)
 	parmas = append(parmas, key)
 

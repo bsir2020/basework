@@ -8,22 +8,22 @@ import (
 )
 
 type config struct {
-	Desc     string
-	Pgsql    *PgSqlConfig
-	Redis    *RedisConfig
-	Rabbitmq *RabbitmqConfig
-	Log      *LogConfig
-	Authkey  *AuthkeyConfig
-	Fillter  *FillterConfig
-	ES       *ESConfig
-	RunMode  int
+	Desc      string
+	Pgsql     *PgSqlConfig
+	Redis     *RedisConfig
+	Rabbitmq  *RabbitmqConfig
+	Log       *LogConfig
+	Authkey   *AuthkeyConfig
+	Fillter   *FillterConfig
+	ES        *ESConfig
+	RunMode   int
 	Concurnum int
 }
 
 type ESConfig struct {
 	Url     string
-	User string
-	Passwd string
+	User    string
+	Passwd  string
 	LogFile string
 }
 
@@ -36,10 +36,12 @@ type PgSqlConfig struct {
 }
 
 type RedisConfig struct {
-	Hosts    []string
-	Password string
-	DB       int
-	MaxActive int
+	Hosts          []string
+	Password       string
+	DB             int
+	MaxActive      int //最大连接数
+	MaxIdle        int //最大空闲连接数
+	IdleTimeoutSec int //最大空闲连接时间
 }
 
 type RabbitmqConfig struct {
