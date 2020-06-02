@@ -12,8 +12,8 @@ dbname = "postgres"
 [redis]
 hosts = ["redis://192.168.1.222:6379"]
 password = "xjwl"
-maxActive = 8000
-MaxIdle = 5000
+maxActive = 3000
+MaxIdle = 2000
 IdleTimeoutSec = 240
 db = 0
 

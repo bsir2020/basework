@@ -7,6 +7,7 @@ import (
 	"github.com/bsir2020/basework/pkg/log"
 	"github.com/gomodule/redigo/redis"
 	"go.uber.org/zap"
+	"sync"
 	"time"
 )
 
@@ -29,42 +30,50 @@ func init() {
 	idleTimeoutSec = cfg.EnvConfig.Redis.IdleTimeoutSec
 }
 
+var once sync.Once
+var redisPool *redis.Pool
+
 func newRedisPool() (redisPool *redis.Pool) {
 	logger := log.New()
 
-	return &redis.Pool{
-		MaxIdle:     maxIdle,
-		MaxActive:   maxActive,
-		IdleTimeout: time.Duration(idleTimeoutSec) * time.Second,
-		Wait:        true,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword),
-				redis.DialConnectTimeout(time.Duration(timeout)*time.Second),
-				redis.DialReadTimeout(time.Duration(timeout)*time.Second),
-				redis.DialWriteTimeout(time.Duration(timeout)*time.Second))
-			if err != nil {
-				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
-				return nil, fmt.Errorf("redis connection error: %s", err)
-			}
+	once.Do(func() {
+		redisPool = &redis.Pool{
+			MaxIdle:     maxIdle,
+			MaxActive:   maxActive,
+			IdleTimeout: time.Duration(idleTimeoutSec) * time.Second,
+			Wait:        true,
+			Dial: func() (redis.Conn, error) {
+				c, err := redis.DialURL(redisURL, redis.DialDatabase(db), redis.DialPassword(redisPassword),
+					redis.DialConnectTimeout(time.Duration(timeout)*time.Second),
+					redis.DialReadTimeout(time.Duration(timeout)*time.Second),
+					redis.DialWriteTimeout(time.Duration(timeout)*time.Second))
+				if err != nil {
+					logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
+					return nil, fmt.Errorf("redis connection error: %s", err)
+				}
 
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) (err error) {
-			if time.Since(t) < time.Minute {
-				return nil
-			}
+				return c, err
+			},
+			TestOnBorrow: func(c redis.Conn, t time.Time) (err error) {
+				if time.Since(t) < time.Minute {
+					return nil
+				}
 
-			_, err = c.Do("PING")
-			if err != nil {
-				logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
-			}
-			return err
-		},
-	}
+				_, err = c.Do("PING")
+				if err != nil {
+					logger.Error("RedisPool", zap.String(api.RedisConnErr.Message, err.Error()))
+				}
+				return err
+			},
+		}
+	})
+
+	return redisPool
 }
 
-func GetRedisConn() (redis.Conn, *api.Errno) {
-	return newRedisPool().Get(), nil
+func GetRedisConn() (redis.Conn, *redis.Pool) {
+	pool := newRedisPool()
+	return pool.Get(), pool
 }
 
 //key:"lock_uid"
@@ -97,10 +106,7 @@ func DelLock(val string) {
 
 func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
 	con, _ := GetRedisConn()
-	if err := con.Err(); err != nil {
-		return nil, err
-	}
-	defer con.Close()
+	//defer pool.Close()
 	parmas := make([]interface{}, 0)
 	parmas = append(parmas, key)
 
