@@ -33,7 +33,7 @@ func init() {
 var once sync.Once
 var redisPl *redis.Pool
 
-func newRedisPool() (redisPool *redis.Pool) {
+func newRedisPool() *redis.Pool {
 	logger := log.New()
 
 	once.Do(func() {
