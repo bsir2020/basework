@@ -117,3 +117,8 @@ func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error)
 	}
 	return con.Do(cmd, parmas...)
 }
+
+func ClosePool() {
+	pool := newRedisPool()
+	pool.Close()
+}
