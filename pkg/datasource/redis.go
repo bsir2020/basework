@@ -80,7 +80,7 @@ func GetRedisConn() (redis.Conn, *redis.Pool) {
 //uid: user_id
 func AddLock(val string) bool {
 	msg, _ := redis.String(
-		Exec("set", "lock:LOCK_"+val, val, "nx", "ex", 4),
+		RedisExec("set", "lock:LOCK_"+val, val, "nx", "ex", 4),
 	)
 
 	if msg == "OK" {
@@ -91,7 +91,7 @@ func AddLock(val string) bool {
 }
 
 func DelLock(val string) {
-	_, err := Exec("del", "lock:LOCK_"+val)
+	_, err := RedisExec("del", "lock:LOCK_"+val)
 	if err != nil {
 		fmt.Println(api.RedisConnErr, err.Error())
 	}
