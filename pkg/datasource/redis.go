@@ -31,13 +31,13 @@ func init() {
 }
 
 var once sync.Once
-var redisPool *redis.Pool
+var redisPl *redis.Pool
 
 func newRedisPool() (redisPool *redis.Pool) {
 	logger := log.New()
 
 	once.Do(func() {
-		redisPool = &redis.Pool{
+		redisPl = &redis.Pool{
 			MaxIdle:     maxIdle,
 			MaxActive:   maxActive,
 			IdleTimeout: time.Duration(idleTimeoutSec) * time.Second,
@@ -68,7 +68,7 @@ func newRedisPool() (redisPool *redis.Pool) {
 		}
 	})
 
-	return redisPool
+	return redisPl
 }
 
 func GetRedisConn() (redis.Conn, *redis.Pool) {
@@ -105,8 +105,8 @@ func DelLock(val string) {
 //}
 
 func Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
-	con, _ := GetRedisConn()
-	//defer pool.Close()
+	con, pool := GetRedisConn()
+	defer pool.Close()
 	parmas := make([]interface{}, 0)
 	parmas = append(parmas, key)
 
